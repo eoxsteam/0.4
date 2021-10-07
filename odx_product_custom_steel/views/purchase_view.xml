@@ -37,13 +37,13 @@
                     <field name="length_in" attrs="{'readonly': [('parent.state', '=', 'purchase')]}"/>
                 </xpath>
 
-                <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
+                <!-- <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
                     <button style="float:right;margin-right:3px;" type="object"
                             name="line_duplicate" class="oe_highlight" string="Duplicate"
                             attrs="{'invisible': [('parent.state', '=', 'purchase')]}" />
 
 
-                </xpath>
+                </xpath> -->
 
 
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="attributes">
@@ -106,9 +106,9 @@
                                 <field name="inner_dia"/>
                                 <field name="outer_dia"/>
                                 <field name="heat_number"/>
-                                <button type="object" class="oe_highlight"
+                                <!-- <button type="object" class="oe_highlight"
                                         name="line_duplicate"
-                                        string="Duplicate" style="margin-left:10px;" attrs="{'invisible': [('parent.state', '=', 'purchase')]}"/>
+                                        string="Duplicate" style="margin-left:10px;" attrs="{'invisible': [('parent.state', '=', 'purchase')]}"/> -->
 
                                 <field name="comp_c" optional="hide"/>
                                 <field name="comp_mn" optional="hide"/>

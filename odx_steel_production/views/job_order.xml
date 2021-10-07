@@ -289,7 +289,7 @@
                                 </group>
                             </page>
 
-                            <page string="Technical Details">
+<!--                             <page string="Technical Details">
                                 <group>
                                     <group>
                                         <field name="shipped_via"/>
@@ -302,16 +302,16 @@
 
                                     </group>
 
-                                </group>
+                                </group> -->
 
                                 <!--                                <group>-->
                                 <!--                                    <field name="processing_info"/>-->
                                 <!--                                </group>-->
-                                <group string="Technical Delivery Conditions">
+                                <!-- <group string="Technical Delivery Conditions">
                                     <field name="technical_delivery_cond"
                                            attrs="{'readonly': [('state', '=', 'done')]}" nolabel="1"/>
                                 </group>
-                            </page>
+                            </page> -->
                             <page string="Terms and Conditions">
                                 <group string="Terms and Conditions">
                                     <field name="terms_conditions"

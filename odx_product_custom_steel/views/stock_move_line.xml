@@ -52,7 +52,7 @@
                 <field name="lot_state" invisible="1"/>
                 <field name="is_invisible" invisible="1"/>
 
-                <button name="get_lot_serial" string="Generate Serial Number" type="object" class="oe_highlight"
+                <button name="get_lot_serial" string="Generate Lot Number" type="object" class="oe_highlight"
                         attrs="{'invisible': [('is_invisible', '=', True)]}"/>
                 <!--                        attrs="{'invisible': ['|', ('state', '=', 'confirm'), ('lot_id', '!=', False)]}"/>-->
                 <!--                not context.get('show_destination_location')-->
@@ -108,7 +108,7 @@
                 <button type="object" class="btn-primary"
                         name="gen_lot_serial"
                         attrs="{'invisible': ['|',('state', '=', 'confirm'),('is_select', '=', False)]}"
-                        string="Generate Serial Number" style="margin-left:10px;"/>
+                        string="Generate Lot Number" style="margin-left:10px;"/>
             </xpath>
         </field>
     </record>

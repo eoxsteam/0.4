@@ -305,9 +305,9 @@
                                         <field name="descriptions"/>
                                         <field name="product_qty" widget="integer"/>
                                         <field name="uom_id"/>
-                                        <button style="float:right;margin-right:3px;" type="object"
+                                        <!-- <button style="float:right;margin-right:3px;" type="object"
                                                 name="line_duplicate" class="oe_highlight" string="Duplicate"
-                                        />
+                                        /> -->
                                     </tree>
                                 </field>
                             </group>

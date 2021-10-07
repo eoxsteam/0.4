@@ -163,9 +163,9 @@
                     <button style="float:right;margin-right:3px;" type="object"
                             name="action_production_wizard" class="oe_highlight" string="Produce"
                             attrs="{'invisible': [('lot_id', '!=', False)]}"/>
-                    <button style="float:right;margin-right:3px;" type="object"
+                    <!-- <button style="float:right;margin-right:3px;" type="object"
                             name="line_duplicate" class="oe_highlight" string="Duplicate"
-                            attrs="{'invisible': [('parent.state', '=', 'sale')]}"/>
+                            attrs="{'invisible': [('parent.state', '=', 'sale')]}"/> -->
                     <!--                    <button name="action_show_lot_details" string="Lot details" type="object" icon="fa-list" width="0.1" attrs="{'invisible': [('lot_id', '=', False)]}"/>-->
                     <field name="production_lot_ids" invisible="1"/>
                     <field name="job_lot_ids" invisible="1"/>
