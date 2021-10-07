@@ -12,7 +12,7 @@
                             <h5>
                                 <u>
                                     <strong>
-                                        <b>R E Q U E S T F O R Q U O T A T I O N</b>
+                                        <b>REQUEST FOR QUOTE</b>
                                     </strong>
                                 </u>
                             </h5>
@@ -155,11 +155,11 @@
                         <br/>
                         <br/>
 
-                        <p>
+                        <!-- <p>
                             <b>Technical Delivery Conditions:</b>
                             <br/>
                             <span t-field="o.technical_delivery_cond"></span>
-                        </p>
+                        </p> -->
 
                         <div class="row">
                             <br/>

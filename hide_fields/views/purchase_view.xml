@@ -14,16 +14,9 @@
                       <field name="name" readonly="1"/>
                   </h1>
               </xpath>
-              <xpath expr="//form/header" position="inside">
-                <button name="action_view_invoice" string="Create Bill" type="object" class="oe_highlight" context="{'create_bill':True}" attrs="{'invisible': ['|', ('state', 'not in', ('purchase', 'done')), ('invoice_status', 'in', ('no', 'invoiced'))]}"/>
-                <button name="action_view_invoice" string="Create Bill" type="object" context="{'create_bill':True}" attrs="{'invisible': ['|', '|', ('state', 'not in', ('purchase', 'done')), ('invoice_status', 'not in', ('no', 'invoiced')), ('order_line', '=', [])]}"/>
-              </xpath>
-<!--               <xpath expr="//form/header/button[@name='action_view_invoice']" position="replace">            
-                <button name="action_view_invoice" string="REcive" type="object" class="oe_highlight" context="{'create_bill':True}" attrs="{'invisible': ['|', ('state', 'not in', ('purchase', 'done')), ('invoice_status', 'in', ('no', 'invoiced'))]}"/>
-                <button name="action_view_invoice" string="REcive" type="object" context="{'create_bill':True}" attrs="{'invisible': ['|', '|', ('state', 'not in', ('purchase', 'done')), ('invoice_status', 'not in', ('no', 'invoiced')), ('order_line', '=', [])]}"/>        
-              </xpath> -->
           </field>
       </record>
+
       <record id="purchase.purchase_rfq" model="ir.actions.act_window">
           <field name="name">Requests for Quote</field>
           <field name="type">ir.actions.act_window</field>
@@ -43,6 +36,7 @@
             </p>
           </field>
       </record>
+
       <record id="purchase.purchase_form_action" model="ir.actions.act_window">
           <field name="name">Purchase Orders</field>
           <field name="type">ir.actions.act_window</field>
@@ -60,20 +54,6 @@
             </p>
           </field>
       </record>
-
-      <!-- <menuitem
-        id="hr_holidays.menu_hr_holidays_configuration"
-        name="Configuration"
-        parent="hr_holidays.menu_hr_holidays_root"
-        sequence="5"
-        groups="base.group_system"/>
-
-      <menuitem 
-        id="hr_expense.menu_hr_expense_configuration" 
-        name="Configuration" 
-        parent="hr_expense.menu_hr_expense_root"
-        sequence="100"
-        groups="base.group_system"/> -->
 
     </data>
 </odoo>

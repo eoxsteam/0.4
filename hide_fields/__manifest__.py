@@ -22,6 +22,7 @@
 
     # always loaded
     'data': [
+        'report/purchase_reports.xml',
         'views/purchase_view.xml',
     ],
     # only loaded in demonstration mode
