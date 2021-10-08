@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+      <record id="view_quotation_tree_inherit" model="ir.ui.view">
+            <field name="name">sale.order.tree.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree"/>
+            <field name="arch" type="xml">
+              <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="string">Quote Number</attribute>
+              </xpath>
+          </field>
+      </record>
+
+      <record id="view_order_form_inherit" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+              <label for="date_order" position="replace">
+                <label for="date_order" string="Quote Date"/>
+              </label>
+          </field>
+      </record>
+
+      <record id="sale.sale_order_view_search_inherit_quotation" model="ir.ui.view">
+          <field name="name">sale.order.search.inherit.quotation</field>
+          <field name="model">sale.order</field>
+          <field name="mode">primary</field>
+          <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+          <field name="arch" type="xml">
+              <xpath expr="//filter[@name='my_sale_orders_filter']" position="replace">
+                  <field name="campaign_id"/>
+                  <separator/>
+                  <filter string="My Quote" name="my_quotation" domain="[('user_id', '=', uid)]"/>
+                  <separator/>
+                  <filter string="Quote" name="draft" domain="[('state','in',('draft', 'sent'))]"/>
+                  <filter string="Sales Orders" name="sales" domain="[('state','in',('sale','done'))]"/>
+                  <separator/>
+                  <filter string="Create Date" name="filter_create_date" date="create_date"/>
+              </xpath>
+          </field>
+      </record>
+
+      <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
+            <field name="name">Quote</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_id" ref="sale.view_quotation_tree_with_onboarding"/>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="search_view_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="context">{'search_default_my_quotation': 1}</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new quote, the first step of a new sale!
+              </p><p>
+                Once the quote is confirmed by the customer, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
+              </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
