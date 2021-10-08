@@ -40,7 +40,6 @@ class PurchaseOrder(models.Model):
             </section>
         """
 
-
     name = fields.Char('Order Reference', required=True, index=True, copy=False, default='New',
                        track_visibility="onchange")
     heat_number = fields.Char(string='Heat Number')
@@ -165,6 +164,11 @@ class PurchaseOrderLine(models.Model):
         else:
             return {'domain': {'sub_category_id': []}}
 
+    @api.onchange('cwt_price')
+    def _get_cwt_based_unit_price(self):
+        if self.cwt_price:
+            self.price_unit = self.cwt_price / 100
+
     @api.onchange('category_id', 'sub_category_id')
     def _domain_product_id(self):
         if self.sub_category_id:
@@ -181,6 +185,7 @@ class PurchaseOrderLine(models.Model):
     width_in = fields.Float(string='Width(in)', digits=[6, 4])
     thickness_in = fields.Float(string='Thickness(in)', digits=[6, 4])
     length_in = fields.Float(string='Length(in)', digits=[6, 4])
+    cwt_price = fields.Float(string='CWT Price', digits=[6, 2])
 
     @api.onchange('product_category_id')
     def _onchange_product_category_id(self):

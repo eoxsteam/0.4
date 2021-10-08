@@ -29,7 +29,9 @@
                                             <td>
                                                 <span>
                                                     :
-                                                    <t t-if="o.partner_id" t-esc="o.partner_id.name"/>
+<!--                                                    <t t-if="o.partner_id" t-esc="o.partner_id.name"/>-->
+                                                   <t t-if="o.picking_type_id"
+                                                       t-esc="o.picking_type_id.warehouse_id.company_id.name"/>
                                                     <br/>
 
                                                 </span>

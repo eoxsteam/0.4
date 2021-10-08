@@ -303,8 +303,13 @@
                                         <field name="sub_category_id"/>
                                         <field name="product_id"/>
                                         <field name="descriptions"/>
+                                        <field name="thickness_in"/>
+                                        <field name="width_in"/>
+                                        <field name="length_in"/>
                                         <field name="product_qty" widget="integer"/>
                                         <field name="uom_id"/>
+                                        <field name="price_unit"/>
+                                        <field name="price_subtotal"/>
                                         <!-- <button style="float:right;margin-right:3px;" type="object"
                                                 name="line_duplicate" class="oe_highlight" string="Duplicate"
                                         /> -->

@@ -101,7 +101,10 @@ class VrmLead(models.Model):
                             'name': specs.descriptions,
                             'product_uom': specs.uom_id.id,
                             'date_planned': fields.Datetime.now(),
-                            'price_unit': 0
+                            'price_unit': specs.price_unit,
+                            'width_in': specs.width_in,
+                            'thickness_in': specs.thickness_in,
+                            'length_in': specs.length_in,
                         })]
 
                     })
@@ -125,7 +128,10 @@ class VrmLead(models.Model):
                         'name': specs.descriptions,
                         'product_uom': specs.uom_id.id,
                         'date_planned': fields.Datetime.now(),
-                        'price_unit': 0
+                        'price_unit': specs.price_unit,
+                        'width_in': specs.width_in,
+                        'thickness_in': specs.thickness_in,
+                        'length_in': specs.length_in,
                     })]
 
                 })

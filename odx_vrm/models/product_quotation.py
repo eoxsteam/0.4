@@ -9,6 +9,14 @@ class ProductQuotation(models.Model):
         for line in self:
             line.copy()
 
+    @api.depends('price_unit', 'product_qty')
+    def _compute_amount(self):
+        for rec in self:
+            if rec.product_qty and rec.price_unit:
+                rec.price_subtotal = rec.price_unit * rec.product_qty
+            else:
+                rec.price_subtotal = 0
+
     @api.onchange('product_category_id')
     def _get_category_list(self):
         self.product_id = False
@@ -30,11 +38,17 @@ class ProductQuotation(models.Model):
         if self.product_id:
             self.uom_id = self.product_id.uom_id.id
 
-    product_category_id = fields.Many2one('product.category', 'Category', domain="[('parent_id', '=', False)]")
+    product_category_id = fields.Many2one('product.category', 'Master', domain="[('parent_id', '=', False)]")
     sub_category_id = fields.Many2one('product.category', string="Sub Category", track_visibility="onchange",
                                       domain="[('parent_id', '=', product_category_id) or [] ] ")
     product_id = fields.Many2one('product.product', string='Sub Product')
-    descriptions = fields.Text(string='Description',required=True)
+    descriptions = fields.Text(string='Description', required=True)
+
+    thickness_in = fields.Float(string='Thickness(in)', digits=[6, 4])
+    width_in = fields.Float(string='Width(in)', digits=[6, 4])
+    length_in = fields.Float(string='Length(in)', digits=[6, 4])
     product_qty = fields.Float(string='Weight')
     uom_id = fields.Many2one('uom.uom', string='UOM')
+    price_unit = fields.Float(string='Unit Price', required=True, digits='Product Price')
+    price_subtotal = fields.Float(compute='_compute_amount', string='Subtotal', store=True)
     vrm_reference_id = fields.Many2one('vrm.lead', string='Vrm')
