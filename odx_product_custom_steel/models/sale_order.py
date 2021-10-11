@@ -236,7 +236,7 @@ class SaleOrder(models.Model):
         }
 
     option_status = fields.Selection([
-        ('draft', 'Quotation'),
+        ('draft', 'Quote'),
         ('sent', 'Options Sent'),
         ('sale', 'Sales Order'),
         ('done', 'Locked'),
