@@ -44,21 +44,49 @@
       </record>
 
       <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
-            <field name="name">Quote</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">sale.order</field>
-            <field name="view_id" ref="sale.view_quotation_tree_with_onboarding"/>
-            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
-            <field name="search_view_id" ref="sale.sale_order_view_search_inherit_quotation"/>
-            <field name="context">{'search_default_my_quotation': 1}</field>
-            <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                Create a new quote, the first step of a new sale!
-              </p><p>
-                Once the quote is confirmed by the customer, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
-              </p>
-            </field>
-        </record>
+          <field name="name">Quote</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">sale.order</field>
+          <field name="view_id" ref="sale.view_quotation_tree_with_onboarding"/>
+          <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+          <field name="search_view_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+          <field name="context">{'search_default_my_quotation': 1}</field>
+          <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+              Create a new quote, the first step of a new sale!
+            </p><p>
+              Once the quote is confirmed by the customer, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
+            </p>
+          </field>
+      </record>
+
+      <record id="sale_management.sale_order_template_action" model="ir.actions.act_window">
+        <field name="name">Quote Templates</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your quote template
+            </p><p>
+                Use templates to create polished, professional quotes in minutes.
+                Send these quotes by email and let your customers sign online.
+                Use cross-selling and discounts to push and boost your sales.
+            </p>
+        </field>
+      </record>
+
+      <!-- Print Action -->
+      <record id="sale.model_sale_order_action_quotation_sent" model="ir.actions.server">
+          <field name="name">Mark Quote as Sent</field>
+          <field name="model_id" ref="sale.model_sale_order"/>
+          <field name="binding_model_id" ref="sale.model_sale_order"/>
+          <field name="binding_view_types">form,list</field>
+          <field name="state">code</field>
+          <field name="code">action = records.action_quotation_sent()</field>
+      </record>
+
+      <menuitem id="sale_management.sale_order_template_menu" action="sale_management.sale_order_template_action" parent="sale.menu_sales_config" sequence="1" name="Quote Templates" groups="sale_management.group_sale_order_template"/>
 
     </data>
 </odoo>

@@ -18,16 +18,19 @@
     'version': '13.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'purchase', 'odx_vrm', 'stock', 'odx_product_custom_steel','sale_crm','sale',],
+    'depends': ['base', 'purchase', 'odx_vrm', 'stock', 'odx_product_custom_steel',
+    'sale_crm','sale','sale_management',],
 
     # always loaded
     'data': [
         'report/purchase_reports.xml',
         'report/sale_report.xml',
+        'data/mail_data.xml',
         'views/purchase_view.xml',
         'views/sale_order_views.xml',
         'views/crm_lead_views.xml',
         'views/sale_views.xml',
+        'views/sale_order_template_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
