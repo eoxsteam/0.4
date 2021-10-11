@@ -213,7 +213,7 @@
         </record>
         <menuitem action="purchase.purchase_rfq" id="menu_purchase_rfq"
                   parent="purchase.menu_procurement_management"
-                  sequence="0"/>
+                  sequence="0"  active="False"/>
         <menuitem id="purchase.menu_procurement_management_supplier_name" name="Vendors"
                   parent="purchase.menu_procurement_management"
                   action="account.res_partner_action_supplier" sequence="15"/>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+        <!-- Crm Form View Inherited -->
         <record id="sale_crm.crm_case_form_view_oppor" model="ir.ui.view">
             <field name="name">crm.lead.oppor.inherited.crm</field>
             <field name="model">crm.lead</field>
