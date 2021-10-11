@@ -13,6 +13,12 @@ class SaleOrder(models.Model):
             ('cancel', 'Cancelled'),
             ], string='Status', readonly=True, copy=False, index=True, tracking=3, default='draft')
 
+    sale_order_template_id = fields.Many2one(
+        'sale.order.template', 'Quote Template',
+        readonly=True, check_company=True,
+        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+
 class SaleOrderTemplate(models.Model):
     _inherit = "sale.order.template"
 
