@@ -158,6 +158,15 @@
                 <xpath expr="//field[@name='order_line']/tree/field[@name='qty_invoiced']" position="attributes">
                     <attribute name="widget">integer</attribute>
                 </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="before">
+                     <field name="cwt_price" string="Price(CWT)" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                      <attribute name="optional">hide</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="attributes">
+                      <attribute name="optional">hide</attribute>
+                </xpath>
 
                 <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
                     <button style="float:right;margin-right:3px;" type="object"

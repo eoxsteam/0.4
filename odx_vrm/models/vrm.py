@@ -105,6 +105,7 @@ class VrmLead(models.Model):
                             'width_in': specs.width_in,
                             'thickness_in': specs.thickness_in,
                             'length_in': specs.length_in,
+                            'cwt_price': specs.cwt_price,
                         })]
 
                     })
@@ -132,6 +133,7 @@ class VrmLead(models.Model):
                         'width_in': specs.width_in,
                         'thickness_in': specs.thickness_in,
                         'length_in': specs.length_in,
+                        'cwt_price': specs.cwt_price,
                     })]
 
                 })

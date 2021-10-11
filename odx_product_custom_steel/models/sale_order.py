@@ -236,7 +236,7 @@ class SaleOrder(models.Model):
         }
 
     option_status = fields.Selection([
-        ('draft', 'Quote'),
+        ('draft', 'Quotation'),
         ('sent', 'Options Sent'),
         ('sale', 'Sales Order'),
         ('done', 'Locked'),
@@ -514,6 +514,11 @@ class SaleOrderLine(models.Model):
             return {'domain': {'lot_id': [('stock_status', '=', 'available'),
                                           ('loc_warehouse', '=', self.parent_warehouse_id.id)]}}
 
+    @api.onchange('cwt_price')
+    def get_cwt_based_unit_price(self):
+        if self.cwt_price:
+            self.price_unit = self.cwt_price / 100
+
     category_id = fields.Many2one('product.category', string="Master", domain="[('parent_id', '=', False)]")
     sub_category_id = fields.Many2one('product.category', string="Sub Category",
                                       domain="[('parent_id', '=', category_id) or [] ] ")
@@ -535,6 +540,7 @@ class SaleOrderLine(models.Model):
     ], string='Material Type', track_visibility="onchange")
 
     parent_warehouse_id = fields.Many2one('stock.warehouse', store=True, string='Warehouse', readonly=False)
+    cwt_price = fields.Float(string='CWT Price', digits=[6, 2])
 
     def action_production_wizard(self):
         wizard = self.env['production.wizard'].create({

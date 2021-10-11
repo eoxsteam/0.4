@@ -308,6 +308,7 @@
                                         <field name="length_in"/>
                                         <field name="product_qty" widget="integer"/>
                                         <field name="uom_id"/>
+                                        <field name="cwt_price"/>
                                         <field name="price_unit"/>
                                         <field name="price_subtotal"/>
                                         <!-- <button style="float:right;margin-right:3px;" type="object"

@@ -18,13 +18,13 @@ class AccountMove(models.Model):
     acc_payment_type = fields.Selection([('outbound', 'Send Money'), ('inbound', 'Receive Money')],
                                         string='Payment Type', readonly=True,
                                         states={'draft': [('readonly', False)]})
-    acc_payment_amount = fields.Monetary(string='Amount', required=True, readonly=True,
+    acc_payment_amount = fields.Monetary(string='Amount', readonly=True,
                                          states={'draft': [('readonly', False)]},
                                          tracking=True)
 
     partner_type = fields.Selection([('customer', 'Customer'), ('supplier', 'Vendor')], tracking=True, readonly=True,
                                     states={'draft': [('readonly', False)]})
-    description = fields.Char(string="Description", default="Miscellaneous Payments", required=True)
+    description = fields.Char(string="Description", default="Miscellaneous Payments")
     acc_pay_account_id = fields.Many2one('account.account', string='Account',
                                          index=True, ondelete="restrict", check_company=True,
                                          domain=[('deprecated', '=', False)])

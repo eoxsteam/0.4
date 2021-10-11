@@ -38,6 +38,11 @@ class ProductQuotation(models.Model):
         if self.product_id:
             self.uom_id = self.product_id.uom_id.id
 
+    @api.onchange('cwt_price')
+    def get_cwt_based_unit_price(self):
+        if self.cwt_price:
+            self.price_unit = self.cwt_price / 100
+
     product_category_id = fields.Many2one('product.category', 'Master', domain="[('parent_id', '=', False)]")
     sub_category_id = fields.Many2one('product.category', string="Sub Category", track_visibility="onchange",
                                       domain="[('parent_id', '=', product_category_id) or [] ] ")
@@ -52,3 +57,4 @@ class ProductQuotation(models.Model):
     price_unit = fields.Float(string='Unit Price', required=True, digits='Product Price')
     price_subtotal = fields.Float(compute='_compute_amount', string='Subtotal', store=True)
     vrm_reference_id = fields.Many2one('vrm.lead', string='Vrm')
+    cwt_price = fields.Float(string='CWT Price', digits=[6, 2])

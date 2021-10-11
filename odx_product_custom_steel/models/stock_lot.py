@@ -44,6 +44,7 @@ class StockProductionLot(models.Model):
         #     products = self.env['product.product'].search([('categ_id', '=', self.sub_category_id.id)])
         #     product_fields_domain = [('id', 'in', products.ids)]
         #     return {'domain': {'product_id': product_fields_domain, }}
+
     #
     # @api.onchange('tag_number_pr1')
     # def _onchange_tag_number_pr1(self):
@@ -57,11 +58,15 @@ class StockProductionLot(models.Model):
     #                 })
     #
 
-
     @api.onchange('vendor_id')
     def _onchange_vendor_serial(self):
         if self.vendor_id.vendor_serial_number:
             self.vendor_serial_number = self.vendor_id.vendor_serial_number
+
+    @api.onchange('reserved_partner_id')
+    def _onchange_reserved_partner_id(self):
+        if self.reserved_partner_id:
+            self.stock_status = 'reserved'
 
     def _compute_image_512(self):
         """Get the image from the template if no image is set on the variant."""
@@ -214,6 +219,9 @@ class StockProductionLot(models.Model):
     landed_cost = fields.Float(string="Unit Landed Cost")
     total_purcahse_cost = fields.Float(string="Total Purcahse Cost")
     total_landed_cost = fields.Float(string="Total Landed Cost")
+    gauge_id = fields.Many2one('steel.gauge', string="Gauge", track_visibility="onchange")
+    reserved_partner_id = fields.Many2one('res.partner', string="Reserve Lot For", track_visibility="onchange")
+    thickness_range_id = fields.Many2one('thickness.range', string="Thickness Range(in)", track_visibility="onchange")
     is_annealed = fields.Selection([
         ('yes', 'Yes'),
         ('no', 'Not Done'),

@@ -17,6 +17,7 @@ from . import stock_inventory_line
 from . import account_move
 from . import rfq_report
 from . import crm
+from . import gauge_master
 
 # from . import product_category
 
