@@ -151,6 +151,7 @@ class SteelProduction(models.Model):
     product_uom_id = fields.Many2one('uom.uom', string='Uom', track_visibility='onchange')
     production_line_ids = fields.One2many('steel.production.line', 'production_ref_id', string="Production Line")
     multi_stage_line_ids = fields.One2many('multi.stage.line', 'production_stage_id', string="Multi Stage Line")
+    lot_skid_line_ids = fields.One2many('lot.skid', 'production_skid_id', string="Lot Skids")
     pro_multi_lot_line_ids = fields.One2many('pro.multi.lot.line', 'pro_ref_id', string="Multi Lot Lines")
     order_line_product = fields.Many2one('product.product', string='OrderLine Product')
     dest_warehouse_id = fields.Many2one('stock.warehouse', 'Dest. Warehouse',
@@ -620,7 +621,6 @@ class SteelProduction(models.Model):
                 if not line.is_scrap:
                     product.append(line)
             finished_picking = self.env['stock.picking'].create({
-
                 'location_id': production_location.id,
                 'location_dest_id': self.dest_warehouse_id.lot_stock_id.id,
                 'picking_type_id': dest_picking_type.id,

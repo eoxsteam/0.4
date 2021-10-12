@@ -15,5 +15,13 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
+<!--bnnnnnnn-->
+        <record id="sequence_lot_skid" model="ir.sequence">
+            <field name="name">Lot Skid</field>
+            <field name="code">lot.skid</field>
+            <field name="prefix">SK/</field>
+            <field name="padding">4</field>
+        </record>
+        <!--bnnnnnnn-->
     </data>
 </odoo>

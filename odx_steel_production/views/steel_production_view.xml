@@ -246,6 +246,22 @@
 
                                 </field>
                             </page>
+                            <page string="Skid Management"
+                                  attrs="{'invisible': [('operation', 'not in', ['multistage'])]}">
+                                <field name="lot_skid_line_ids">
+                                    <tree editable="bottom">
+                                        <field name="tag"/>
+                                        <field name="lot_ids"
+                                               widget="many2many_tags"/>
+<!--                                        <field name="skid_lot_ids"-->
+<!--                                               widget="many2many_tags"/>-->
+
+                                        <field name="weight" readonly="1" force_save="1"/>
+                                        <field name="production_skid_id" invisible="1"/>
+                                    </tree>
+
+                                </field>
+                            </page>
                             <page string="Removed" invisible="1">
 
                                 <group string="Requested Specs">

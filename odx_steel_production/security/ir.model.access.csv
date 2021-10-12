@@ -9,3 +9,4 @@ access_job_order_line,access_job_order_line,model_job_order_line,,1,1,1,1
 access_job_multi_stage_line,access_job_multi_stage_line,model_job_multi_stage_line,,1,1,1,1
 access_multi_lot_line,access_multi_lot_line,model_multi_lot_line,,1,1,1,1
 access_pro_multi_lot_line,access_pro_multi_lot_line,model_pro_multi_lot_line,,1,1,1,1
+access_lot_skid,access_lot_skid,model_lot_skid,,1,1,1,1
