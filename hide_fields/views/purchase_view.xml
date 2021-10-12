@@ -27,8 +27,29 @@
       </record>
 
       <!-- Purchase/Orders/Requests For Quote -->
-      <record model="ir.ui.menu" id="purchase.menu_purchase_rfq">
-        <field name="name">Requests For Quote</field>
+      <!-- <record model="ir.ui.menu" id="purchase.menu_purchase_rfq">
+        <field name="name">Requests for Quote</field>
+      </record> -->
+
+      <!-- Purchase RFQ Tree View  -->
+      <record id="purchase.purchase_rfq" model="ir.actions.act_window">
+          <field name="name">Requests for Quote</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">purchase.order</field>
+          <field name="view_mode">tree,kanban,form,pivot,graph,calendar,activity</field>
+          <field name="view_id" ref="purchase.purchase_order_tree"/>
+          <field name="domain">[('state','in',('draft', 'sent', 'to approve', 'cancel'))]</field>
+          <field name="context">{}</field>
+          <field name="search_view_id" ref="purchase.view_purchase_order_filter"/>
+          <field name="context">{'quotation_only': True}</field>
+          <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+              Create a request for quote
+            </p><p>
+              The quote contains the history of the discussion
+              you had with your vendor.
+            </p>
+          </field>
       </record>
 
     </data>

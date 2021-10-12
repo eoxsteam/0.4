@@ -31,6 +31,7 @@
         'views/crm_lead_views.xml',
         'views/sale_views.xml',
         'views/sale_order_template_views.xml',
+        'views/stock_lot_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
