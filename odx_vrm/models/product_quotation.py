@@ -47,7 +47,7 @@ class ProductQuotation(models.Model):
     sub_category_id = fields.Many2one('product.category', string="Sub Category", track_visibility="onchange",
                                       domain="[('parent_id', '=', product_category_id) or [] ] ")
     product_id = fields.Many2one('product.product', string='Sub Product')
-    descriptions = fields.Text(string='Description', required=True)
+    descriptions = fields.Text(string='Description')
 
     thickness_in = fields.Float(string='Thickness(in)', digits=[6, 4])
     width_in = fields.Float(string='Width(in)', digits=[6, 4])
@@ -58,3 +58,8 @@ class ProductQuotation(models.Model):
     price_subtotal = fields.Float(compute='_compute_amount', string='Subtotal', store=True)
     vrm_reference_id = fields.Many2one('vrm.lead', string='Vrm')
     cwt_price = fields.Float(string='CWT Price', digits=[6, 2])
+
+    name = fields.Char(string="Description")
+    display_type = fields.Selection([
+        ('line_section', "Section"),
+        ('line_note', "Note")], default=False, help="Technical field for UX purpose.")

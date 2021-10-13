@@ -297,12 +297,24 @@
                     <notebook>
                         <page string="Orders">
                             <group>
-                                <field name="vrm_spec_ids" nolabel="1">
+                                <field name="vrm_spec_ids" nolabel="1" widget="section_and_note_one2many">
                                     <tree editable="bottom">
+                                        <control>
+                                            <create name="add_product_control" string="Add a product"/>
+                                            <create name="add_section_control" string="Add a section"
+                                                    context="{'default_display_type': 'line_section'}"/>
+                                            <create name="add_note_control" string="Add a note"
+                                                    context="{'default_display_type': 'line_note'}"/>
+                                        </control>
+
+
+                                        <field name="display_type" invisible="1"/>
+
                                         <field name="product_category_id"/>
                                         <field name="sub_category_id"/>
                                         <field name="product_id"/>
-                                        <field name="descriptions"/>
+                                        <field name="name"  widget="section_and_note_text" optional="show" required="True"/>
+                                        <field name="descriptions" optional="hide"/>
                                         <field name="thickness_in"/>
                                         <field name="width_in"/>
                                         <field name="length_in"/>
@@ -311,6 +323,7 @@
                                         <field name="cwt_price"/>
                                         <field name="price_unit"/>
                                         <field name="price_subtotal"/>
+
                                         <!-- <button style="float:right;margin-right:3px;" type="object"
                                                 name="line_duplicate" class="oe_highlight" string="Duplicate"
                                         /> -->

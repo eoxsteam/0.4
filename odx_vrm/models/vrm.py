@@ -92,23 +92,25 @@ class VrmLead(models.Model):
                 })
                 print(po)
                 for specs in self.vrm_spec_ids:
-                    po.write({
-                        'order_line': [(0, 0, {
-                            'product_category_id': specs.product_category_id.id,
-                            'sub_category_id': specs.sub_category_id.id,
-                            'product_id': specs.product_id.id,
-                            'product_qty': specs.product_qty,
-                            'name': specs.descriptions,
-                            'product_uom': specs.uom_id.id,
-                            'date_planned': fields.Datetime.now(),
-                            'price_unit': specs.price_unit,
-                            'width_in': specs.width_in,
-                            'thickness_in': specs.thickness_in,
-                            'length_in': specs.length_in,
-                            'cwt_price': specs.cwt_price,
-                        })]
+                    if specs.display_type not in ['line_section','line_note']:
+                        po.write({
+                            'order_line': [(0, 0, {
+                                'product_category_id': specs.product_category_id.id,
+                                'sub_category_id': specs.sub_category_id.id,
+                                'product_id': specs.product_id.id,
+                                'product_qty': specs.product_qty,
+                                # 'name': specs.descriptions,
+                                'name': specs.name,
+                                'product_uom': specs.uom_id.id,
+                                'date_planned': fields.Datetime.now(),
+                                'price_unit': specs.price_unit,
+                                'width_in': specs.width_in,
+                                'thickness_in': specs.thickness_in,
+                                'length_in': specs.length_in,
+                                'cwt_price': specs.cwt_price,
+                            })]
 
-                    })
+                        })
 
         else:
             purchase_obj = self.env['purchase.order']
@@ -120,23 +122,24 @@ class VrmLead(models.Model):
             })
             print(po)
             for specs in self.vrm_spec_ids:
-                po.write({
-                    'order_line': [(0, 0, {
-                        'product_category_id': specs.product_category_id.id,
-                        'sub_category_id': specs.sub_category_id.id,
-                        'product_id': specs.product_id.id,
-                        'product_qty': specs.product_qty,
-                        'name': specs.descriptions,
-                        'product_uom': specs.uom_id.id,
-                        'date_planned': fields.Datetime.now(),
-                        'price_unit': specs.price_unit,
-                        'width_in': specs.width_in,
-                        'thickness_in': specs.thickness_in,
-                        'length_in': specs.length_in,
-                        'cwt_price': specs.cwt_price,
-                    })]
+                if specs.display_type not in ['line_section', 'line_note']:
+                    po.write({
+                        'order_line': [(0, 0, {
+                            'product_category_id': specs.product_category_id.id,
+                            'sub_category_id': specs.sub_category_id.id,
+                            'product_id': specs.product_id.id,
+                            'product_qty': specs.product_qty,
+                            'name': specs.name,
+                            'product_uom': specs.uom_id.id,
+                            'date_planned': fields.Datetime.now(),
+                            'price_unit': specs.price_unit,
+                            'width_in': specs.width_in,
+                            'thickness_in': specs.thickness_in,
+                            'length_in': specs.length_in,
+                            'cwt_price': specs.cwt_price,
+                        })]
 
-                })
+                    })
 
             # return {
             #     'type': 'ir.actions.act_window',

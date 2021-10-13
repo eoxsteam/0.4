@@ -8,6 +8,9 @@
                 <xpath expr="//form/sheet/group[1]" position="attributes">
                     <attribute name="string">Supplier Info</attribute>
                 </xpath>
+                <xpath expr="//button[@name='action_view_invoice'][1]" position="attributes">
+                    <attribute name="string">Receive Invoice</attribute>
+                </xpath>
                 <xpath expr="//button[@name='action_view_invoice'][2]" position="attributes">
                     <attribute name="string">Receive Invoice</attribute>
                 </xpath>
@@ -66,6 +69,10 @@
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
                     <attribute name="optional">hide</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
+                    <button type="object" name="action_view_purchase" class="oe_highlight"
+                            string="Add. Specs"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="attributes">
                     <attribute name="optional">hide</attribute>
@@ -213,7 +220,7 @@
         </record>
         <menuitem action="purchase.purchase_rfq" id="menu_purchase_rfq"
                   parent="purchase.menu_procurement_management"
-                  sequence="0"  active="False"/>
+                  sequence="0"/>
         <menuitem id="purchase.menu_procurement_management_supplier_name" name="Vendors"
                   parent="purchase.menu_procurement_management"
                   action="account.res_partner_action_supplier" sequence="15"/>

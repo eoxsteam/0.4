@@ -162,8 +162,10 @@ class StockProductionLot(models.Model):
     location = fields.Char(string='Location', track_visibility="onchange")
 
     width_in = fields.Float(string='Width(in)', track_visibility="onchange", digits=[6, 4])
+
     width_mm = fields.Float(string='Width(mm)', track_visibility="onchange", digits=[8, 2])
-    thickness_in = fields.Float(string='Thickness(in)', track_visibility="onchange", digits=[6, 4])
+    thickness_in = fields.Float(string='Thickness LL(in)', track_visibility="onchange", digits=[6, 4])
+    thickness_in_ul = fields.Float(string='Thickness UL(in)', track_visibility="onchange", digits=[6, 4])
     thickness_mm = fields.Float(string='Thickness(mm)', track_visibility="onchange", digits=[8, 2])
     thickness_spec = fields.Char(string='Thickness Spec', track_visibility="onchange")
     length_in = fields.Float(string='Length(in)', track_visibility="onchange", digits=[8, 4])
@@ -222,6 +224,7 @@ class StockProductionLot(models.Model):
     gauge_id = fields.Many2one('steel.gauge', string="Gauge", track_visibility="onchange")
     reserved_partner_id = fields.Many2one('res.partner', string="Reserve Lot For", track_visibility="onchange")
     thickness_range_id = fields.Many2one('thickness.range', string="Thickness Range(in)", track_visibility="onchange")
+    no_of_pieces = fields.Integer(string="No. of Pieces", track_visibility="onchange", default=1)
     is_annealed = fields.Selection([
         ('yes', 'Yes'),
         ('no', 'Not Done'),

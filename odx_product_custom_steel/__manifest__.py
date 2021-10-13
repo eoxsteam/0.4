@@ -46,6 +46,7 @@
         'views/rfq_report.xml',
         'views/transfer_view.xml',
         'views/master.xml',
+        'views/additional_specs.xml',
         'report/barcode_generator_lot.xml',
         'report/barcode_lot.xml',
         'report/barcode_picking.xml',

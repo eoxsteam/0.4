@@ -84,8 +84,8 @@
 
         <menuitem id="menu_gauge_master" name="Gauges" action="action_gauge_master"
                   parent="stock.menu_stock_config_settings" sequence="277"/>
-        <menuitem id="menu_thk_range_master" name="Thickness Range" action="action_thickness_range_master"
-                  parent="stock.menu_stock_config_settings" sequence="278"/>
+<!--        <menuitem id="menu_thk_range_master" name="Thickness Range" action="action_thickness_range_master"-->
+<!--                  parent="stock.menu_stock_config_settings" sequence="278"/>-->
 
 
     </data>

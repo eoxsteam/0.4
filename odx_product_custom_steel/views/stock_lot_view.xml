@@ -185,7 +185,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <label for="thickness_in"/>
+                                        <label for="thickness_in" string="Thickness Range(in)"/>
                                     </td>
                                     <td>
                                         <field name="thickness_in" string="Thickness(IN)"
@@ -193,7 +193,15 @@
                                                attrs="{'readonly': [('state', '=', 'confirm')]}"/>
                                         <field name="thickness_in" string="Thickness(IN)" invisible="1"/>
                                     </td>
-                                    <td width="5%"></td>
+                                    <td width="5%"><span>to</span></td>
+                                    <td colspan="2">
+                                         <field name="thickness_in_ul" string="Thickness(IN)"
+                                               t-options='{"widget": "float", "decimal_precision": "Product Unit of Measure"}'
+                                               attrs="{'readonly': [('state', '=', 'confirm')]}"/>
+
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>
                                         <label for="thickness_mm"/>
                                     </td>
@@ -201,6 +209,11 @@
                                         <field name="thickness_mm" string="Thickness(MM)" readonly="1" force_save="1"/>
                                         <field name="thickness_mm" string="Thickness(MM)" invisible="1"/>
                                     </td>
+                                    <td width="5%"></td>
+                                    <td>
+
+                                    </td>
+                                    <td></td>
                                 </tr>
 
                                 <tr>
@@ -302,13 +315,21 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <label for="thickness_range_id" string="Thk Range(in)"/>
+                                         <label for="no_of_pieces" string="No. of Pieces"/>
                                     </td>
                                     <td>
-                                        <field name="thickness_range_id" attrs="{'readonly': [('state', '=', 'confirm')]}"/>
-
+                                        <field name="no_of_pieces" attrs="{'readonly': [('state', '=', 'confirm')]}"/>
                                     </td>
                                 </tr>
+<!--                                <tr>-->
+<!--                                    <td>-->
+<!--                                        <label for="thickness_range_id" string="Thk Range(in)"/>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <field name="thickness_range_id" attrs="{'readonly': [('state', '=', 'confirm')]}"/>-->
+
+<!--                                    </td>-->
+<!--                                </tr>-->
                             </table>
                         </group>
                     </group>

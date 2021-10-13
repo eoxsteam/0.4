@@ -58,7 +58,6 @@ class SaleOrder(models.Model):
         else:
             raise UserError(_("You do not have the permission to access Job Orders. Please contact admin"))
 
-
     def _compute_production_count(self):
         lines = []
         if self.order_line:
@@ -236,7 +235,7 @@ class SaleOrder(models.Model):
         }
 
     option_status = fields.Selection([
-        ('draft', 'Quote'),
+        ('draft', 'Quotation'),
         ('sent', 'Options Sent'),
         ('sale', 'Sales Order'),
         ('done', 'Locked'),
@@ -541,6 +540,39 @@ class SaleOrderLine(models.Model):
 
     parent_warehouse_id = fields.Many2one('stock.warehouse', store=True, string='Warehouse', readonly=False)
     cwt_price = fields.Float(string='CWT Price', digits=[6, 2])
+
+    width_tolerance_min = fields.Float(string='Width Tolerance(min)', digits=[6, 4])
+    width_tolerance_max = fields.Float(string='Width Tolerance(max)', digits=[6, 4])
+    gauge_tolerance_min = fields.Float(string='Gauge Tolerance(min)')
+    gauge_tolerance_max = fields.Float(string='Gauge Tolerance(max)')
+    dia_id = fields.Float(string='ID')
+    dia_od_min = fields.Float(string='OD(min)')
+    dia_od_max = fields.Float(string='OD(min)')
+    rockwell_min = fields.Float(string='Rockwell(min)', digits=[6, 1])
+    rockwell_max = fields.Float(string='Rockwell(max)', digits=[6, 1])
+    part_no = fields.Text(string='Part Number')
+    fork_lift = fields.Text(string='Forklift')
+    certsreq = fields.Selection([
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    ], string='CertsReq ', default='yes')
+    spacers = fields.Integer(string='Spacers ')
+    mx_skid_wt = fields.Char(string='Max Skid Wt.')
+    over_head_crar = fields.Selection([
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    ], string='Over Head Crar', default='yes')
+
+    def action_view_order(self):
+        action = {
+            'type': 'ir.actions.act_window',
+            'views': [(self.env.ref('odx_product_custom_steel.button_sale_order_line_form').id, 'form')],
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'new',
+            'name': _('Sale Order lines'),
+            'res_model': 'sale.order.line', }
+        return action
 
     def action_production_wizard(self):
         wizard = self.env['production.wizard'].create({

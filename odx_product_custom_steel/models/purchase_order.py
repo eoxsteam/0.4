@@ -187,6 +187,39 @@ class PurchaseOrderLine(models.Model):
     length_in = fields.Float(string='Length(in)', digits=[6, 4])
     cwt_price = fields.Float(string='CWT Price', digits=[6, 2])
 
+    width_tolerance_min = fields.Float(string='Width Tolerance(min)', digits=[6, 4])
+    width_tolerance_max = fields.Float(string='Width Tolerance(max)', digits=[6, 4])
+    gauge_tolerance_min = fields.Float(string='Gauge Tolerance(min)')
+    gauge_tolerance_max = fields.Float(string='Gauge Tolerance(max)')
+    dia_id = fields.Float(string='ID')
+    dia_od_min = fields.Float(string='OD(min)')
+    dia_od_max = fields.Float(string='OD(min)')
+    rockwell_min = fields.Float(string='Rockwell(min)', digits=[6, 1])
+    rockwell_max = fields.Float(string='Rockwell(max)', digits=[6, 1])
+    part_no = fields.Text(string='Part Number')
+    fork_lift = fields.Text(string='Forklift')
+    certsreq = fields.Selection([
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    ], string='CertsReq ', default='yes')
+    spacers = fields.Integer(string='Spacers ')
+    mx_skid_wt = fields.Char(string='Max Skid Wt.')
+    over_head_crar = fields.Selection([
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    ], string='Over Head Crar', default='yes')
+
+    def action_view_purchase(self):
+        action = {
+            'type': 'ir.actions.act_window',
+            'views': [(self.env.ref('odx_product_custom_steel.button_purchase_order_line_form').id, 'form')],
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'new',
+            'name': _('Purchase Order lines'),
+            'res_model': 'purchase.order.line', }
+        return action
+
     @api.onchange('product_category_id')
     def _onchange_product_category_id(self):
         if self.product_category_id:
