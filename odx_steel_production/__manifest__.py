@@ -21,12 +21,16 @@
         'views/steel_production_view.xml',
         'views/job_order.xml',
         'views/back_end.xml',
+        'views/processing_instruction.xml',
+        'views/master.xml',
         # 'views/stock_valuation.xml',
         'reports/barcode_production.xml',
         'reports/barcode_job_order.xml',
         'wizard/cancel_wizard.xml',
         'wizard/jo_cancel_wizard.xml',
         'wizard/attchment_wizard.xml',
+        # 'wizard/second_run_view.xml',
+        # 'wizard/prd_confirmation_view.xml',
 
     ],
     # only loaded in demonstration mode

@@ -1,0 +1,49 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="production_machine_master_tree_view">
+            <field name="name">production.machine.tree.view</field>
+            <field name="model">production.machine</field>
+            <field name="arch" type="xml">
+                <tree string="Machine Details">
+                    <field name="name"/>
+                    <field name="machine_code"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="production_machine_master_form_view">
+            <field name="name">production.machine.form.view</field>
+            <field name="model">production.machine</field>
+            <field name="arch" type="xml">
+                <form string="Machine Details">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="machine_code"/>
+                            </group>
+                            <group>
+
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_machine_master" model="ir.actions.act_window">
+            <field name="name">Machines</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">production.machine</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                id="menu_machine_master"
+                name="Machines"
+                action="action_machine_master"
+                parent="menu_work_order_configuration"
+                sequence="20"/>
+
+    </data>
+</odoo>

@@ -93,6 +93,7 @@ class SteelProduction(models.Model):
         ('cutting', 'Cut to Length'),
         ('parting', 'Break for Weight(Parting)'),
         ('multistage', 'Blanking(MultiStage)'),
+        ('multistage_slitting', 'MultiStage Slitting'),
         ('annealing', 'Annealing'),
         ('cr', 'Cold Rolling'),
         ('degreasing', 'DeGreasing'),
@@ -138,6 +139,8 @@ class SteelProduction(models.Model):
 
     lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Lot", track_visibility='onchange',
                              domain=[('material_type', '=', 'coil'), ('stock_status', '=', 'available')])
+    second_run_lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Lot", track_visibility='onchange',
+                                        domain=[('material_type', '=', 'coil'), ('stock_status', '=', 'available')])
     picking_id = fields.Many2one('stock.picking', string='Picking')
     finished_picking_id = fields.Many2one('stock.picking', string='Finished Picking')
     finished_move_id = fields.Many2one('stock.move', string='Stock Move')
@@ -156,11 +159,32 @@ class SteelProduction(models.Model):
     order_line_product = fields.Many2one('product.product', string='OrderLine Product')
     dest_warehouse_id = fields.Many2one('stock.warehouse', 'Dest. Warehouse',
                                         required=True)
+    instruction_id = fields.Many2one('production.instructions', string='Instruction Ref')
+    instruction_line_id = fields.Many2one('instructions.run.line', string='Instruction Line Ref')
 
     coil_processing_details = fields.Html(string="Coil Processing Details", translate=True)
     technical_delivery_cond = fields.Html(string="Technical Delivery Conditions", translate=True,
                                           default=_get_default_ftechnical_delivery_cond)
     terms_conditions = fields.Html(string='Terms & Conditions', translate=True, default=_get_default_terms)
+    scrap_percent = fields.Float(string='Scrap Percent',)
+    # compute = 'scrap_percentage'
+
+    # def scrap_percentage(self):
+    #     scrap_wt = 0
+    #     self.scrap_percent = 0
+    #     for lots in self:
+    #         if lots.multi_stage_line_ids:
+    #             for rec in lots.multi_stage_line_ids:
+    #                 if rec.is_scrap:
+    #                     scrap_wt += rec.product_qty
+    #         if lots.production_line_ids:
+    #             for line in lots.production_line_ids:
+    #                 if line.is_scrap:
+    #                     scrap_wt += line.product_qty
+    #         if lots.instruction_id.product_qty > 0:
+    #             lots.scrap_percent = (scrap_wt / lots.instruction_id.product_qty) * 100
+    #         print(lots.scrap_percent)
+    #         print(lots.instruction_id.product_qty)
 
     def action_confirm(self):
         for line in self.production_line_ids:
@@ -329,6 +353,215 @@ class SteelProduction(models.Model):
                         self.write({'state': 'confirm'})
                 else:
                     raise UserError(_("Sum of the Weights exceeded the Coil Weight"))
+
+    def action_confirm_ms_slitting(self):
+        for line in self.production_line_ids:
+            if line.product_qty <= 0:
+                raise UserError(
+                    _("Weight is not Provided in line"))
+            else:
+                self.state = "confirm"
+
+    def create_second_run_picking(self):
+        picking_type = self.env['stock.picking.type'].search(
+            [('code', '=', 'internal'), ('company_id', '=', self.env.company.id)])
+        production_location = self.env['stock.location'].search([('usage', '=', 'production'),
+                                                                 ('company_id', '=',
+                                                                  self.env.company.id)],
+                                                                limit=1)
+        dest_picking_type = self.env['stock.picking.type'].search(
+            [('code', '=', 'internal'), ('company_id', '=', self.env.company.id),
+             ('warehouse_id', '=', self.dest_warehouse_id.id)])
+
+        dest_wh_location = self.env.ref('stock.stock_location_stock').id
+        dest_wh = self.env['stock.warehouse'].search([('lot_stock_id', '=', dest_wh_location)])
+
+        if self.second_run_lot_id:
+            picking_type = self.env['stock.picking.type'].search(
+                [('code', '=', 'internal'), ('company_id', '=', self.env.company.id),
+                 ('warehouse_id', '=', self.second_run_lot_id.loc_warehouse.id)])
+
+            picking_source_id = self.env['stock.picking'].create({
+                'location_id': self.second_run_lot_id.loc_warehouse.lot_stock_id.id,
+                'location_dest_id': production_location.id,
+                'picking_type_id': picking_type.id,
+                'company_id': self.env.company.id,
+                # 'partner_id': self.source_id.partner_id.id,
+                # 'location_dest_id': self.env.ref('stock.picking_type_internal').id,
+
+            })
+            # self.picking_id = picking_source_id
+            move = self.env['stock.move'].create({
+                'name': self.second_run_lot_id.product_id.name,
+                'product_id': self.second_run_lot_id.product_id.id,
+                'product_uom_qty': self.second_run_lot_id.product_qty,
+                'product_uom': self.second_run_lot_id.product_uom_id.id,
+                'picking_id': picking_source_id.id,
+                'location_id': self.second_run_lot_id.loc_warehouse.lot_stock_id.id,
+                'location_dest_id': production_location.id,
+                # 'location_id': self.env.ref('stock.stock_location_stock').id,
+                # 'location_dest_id': self.env.ref('stock.picking_type_internal').id,
+                # self.env.ref('stock.picking_type_internal').id,
+            })
+            move_line_id = self.env['stock.move.line'].create(move._prepare_move_line_vals())
+
+            for line in move_line_id:
+                line.lot_id = self.second_run_lot_id.id
+                line.lot_name = self.second_run_lot_id.name
+                line.qty_done = self.second_run_lot_id.product_qty
+            picking_source_id.button_validate()
+
+            self.second_run_lot_id.stock_status = 'not_available'
+
+            self.second_run_lot_id.process_done = 'slitting'
+            if self.operation == 'annealing':
+                self.second_run_lot_id.is_annealed = 'yes'
+
+            # self.lot_id.stock_status = 'not_available'
+
+        if self.production_line_ids:
+            product = []
+            for line in self.production_line_ids:
+                if not line.is_scrap:
+                    product.append(line)
+            finished_picking = self.env['stock.picking'].create({
+                'location_id': production_location.id,
+                'location_dest_id': self.dest_warehouse_id.lot_stock_id.id,
+                'picking_type_id': dest_picking_type.id,
+                'company_id': self.env.company.id,
+                # 'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                # 'picking_type_id': self.env.ref('stock.picking_type_internal').id,
+                # 'partner_id': self.source_id.partner_id.id,
+                # 'location_id': self.env.ref('stock.picking_type_internal').id,
+
+            })
+            self.finished_picking_id = finished_picking.id
+
+            for products in product:
+                move_lines_list = []
+                new_move_list = []
+                status_stock = ''
+                i = bundle_quantity = 0
+                sheet_numbers = 0
+
+                if products.product_qty:
+                    move = self.env['stock.move'].create({
+                        'name': products.product_id.name,
+                        'product_id': products.product_id.id,
+                        'product_uom_qty': products.product_qty,
+                        'product_uom': products.product_uom_id.id,
+                        'picking_id': finished_picking.id,
+                        # 'location_id': self.env.ref('stock.picking_type_internal').id,
+                        'location_id': production_location.id,
+                        'location_dest_id': self.dest_warehouse_id.lot_stock_id.id,
+                        # 'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+
+                    })
+                    self.finished_move_id = move.id
+                lot_ids = []
+
+                # sequence = self.env['ir.sequence'].next_by_code('stock.lot.serial.custom')
+                rounding = products.product_uom_id.rounding
+                qty = float_round(products.product_qty, precision_rounding=rounding)
+                if products.production_ref_id.sale_order_id:
+                    if products.is_balance == False:
+                        status_stock = 'reserved'
+                    else:
+                        status_stock = 'available'
+                else:
+                    status_stock = 'available'
+
+                new_lots = self.env['stock.production.lot'].with_context({'baby_lot': True}). \
+                    create(
+                    {'name': _('New'),
+                     'product_id': products.product_id.id,
+                     'company_id': self.env.company.id,
+                     'sub_category_id': products.product_id.categ_id.id,
+                     'category_id': products.product_id.categ_id.parent_id.id,
+                     'product_qty': qty,
+                     'weight_lb': products.product_qty,
+                     'product_uom_id': products.product_uom_id.id,
+                     'thickness_in': products.thickness_in,
+                     'width_in': products.width_in,
+                     'length_in': products.length_in if products.material_type == 'sheets' else 0,
+                     'material_type': products.material_type,
+                     'number_of_sheets': products.number_of_sheets if products.material_type == 'sheets' else 0,
+                     'is_child_coil': True,
+                     'parent_coil_id': products.lot_id.id,
+                     'stock_status': status_stock,
+                     'bill_of_lading': products.lot_id.bill_of_lading,
+                     'vendor_id': products.lot_id.vendor_id.id if products.lot_id.vendor_id else False,
+                     # 'vendor_location_id': products.lot_id.vendor_location_id.id if products.lot_id.vendor_location_id else False,
+                     'vendor_serial_number': products.lot_id.vendor_serial_number,
+                     'thickness_spec': products.lot_id.thickness_spec,
+                     'rockwell': products.lot_id.rockwell,
+                     'yield_mpa': products.lot_id.yield_mpa,
+                     'elongation': products.lot_id.elongation,
+                     'tensile_mpa': products.lot_id.tensile_mpa,
+                     'date_received': products.lot_id.date_received,
+
+                     'internet_serial': products.lot_id.internet_serial,
+                     'packing_slip_no': products.lot_id.packing_slip_no,
+                     'comp_c': products.lot_id.comp_c,
+                     'comp_mn': products.lot_id.comp_mn,
+                     'comp_p': products.lot_id.comp_p,
+                     'comp_s': products.lot_id.comp_s,
+                     'comp_si': products.lot_id.comp_si,
+                     'comp_al': products.lot_id.comp_al,
+                     'comp_cr': products.lot_id.comp_cr,
+                     'comp_nb': products.lot_id.comp_nb,
+                     'comp_ti': products.lot_id.comp_ti,
+                     'comp_ca': products.lot_id.comp_ca,
+                     'comp_n': products.lot_id.comp_n,
+                     'comp_ni': products.lot_id.comp_ni,
+                     'comp_cu': products.lot_id.comp_cu,
+                     'comp_v': products.lot_id.comp_v,
+                     'comp_b': products.lot_id.comp_b,
+                     'pass_oil': products.lot_id.pass_oil,
+                     'finish': products.lot_id.finish,
+                     'temper': products.lot_id.temper,
+                     'category': products.lot_id.category,
+                     'coating': products.lot_id.coating,
+                     'heat_number': products.lot_id.heat_number,
+                     'lift_number': products.lot_id.lift_number,
+                     'part_number': products.lot_id.part_number,
+                     'tag_number': products.lot_id.tag_number,
+                     'grade': products.lot_id.grade,
+                     'quality': products.lot_id.quality,
+                     'loc_city': self.dest_warehouse_id.lot_stock_id.id,
+                     'loc_warehouse': self.dest_warehouse_id.id,
+                     # 'loc_city': self.env.ref('stock.stock_location_stock').id,
+                     # 'loc_warehouse': dest_wh.id,
+                     'po_number': products.lot_id.po_number,
+                     'is_annealed': 'yes' if self.operation == 'annealing' else 'no',
+                     'purchase_cost': products.lot_id.purchase_cost + products.lot_id.landed_cost,
+                     'total_purcahse_cost': (products.lot_id.purchase_cost + products.lot_id.landed_cost) * qty,
+
+                     })
+                new_lots._onchange_width()
+                new_lots._onchange_thickness()
+                new_lots._onchange_length()
+                lot_ids.append(new_lots)
+                products.finished_lot_id = new_lots.id
+                products.lot_status = new_lots.stock_status
+                move_line_id = self.env['stock.move.line'].create(
+                    move._prepare_move_line_vals())
+
+                for line in move_line_id:
+                    line.lot_id = new_lots.id
+                    line.qty_done = qty
+                    new_move_list = line.id
+
+            try:
+                finished_picking.action_confirm()
+            except:
+                pass
+            finished_picking.with_context({'baby_lot': True}).button_validate()
+            self.write({'state': 'done'})
+            # self.lot_status = 'not_available'
+            # if self.sale_order_id:
+            #     print('fg')
+            #     return self.action_create_picking()
 
     def action_cancel(self):
         if self.user_has_groups('odx_steel_production.group_steel_production_manager'):
@@ -549,6 +782,200 @@ class SteelProduction(models.Model):
                 rec.lot_id.stock_status = 'available'
                 rec.lot_status = 'available'
 
+    def create_multi_stage_picking(self):
+        picking_type = self.env['stock.picking.type'].search(
+            [('code', '=', 'internal'), ('company_id', '=', self.env.company.id)])
+        production_location = self.env['stock.location'].search([('usage', '=', 'production'),
+                                                                 ('company_id', '=',
+                                                                  self.env.company.id)],
+                                                                limit=1)
+        dest_picking_type = self.env['stock.picking.type'].search(
+            [('code', '=', 'internal'), ('company_id', '=', self.env.company.id),
+             ('warehouse_id', '=', self.dest_warehouse_id.id)])
+
+        dest_wh_location = self.env.ref('stock.stock_location_stock').id
+        dest_wh = self.env['stock.warehouse'].search([('lot_stock_id', '=', dest_wh_location)])
+
+        for lots in self.pro_multi_lot_line_ids:
+            picking_type = self.env['stock.picking.type'].search(
+                [('code', '=', 'internal'), ('company_id', '=', self.env.company.id),
+                 ('warehouse_id', '=', lots.src_warehouse_id.id)])
+
+            picking_source_id = self.env['stock.picking'].create({
+                'location_id': lots.src_warehouse_id.lot_stock_id.id,
+                'location_dest_id': production_location.id,
+                'picking_type_id': picking_type.id,
+                'company_id': self.env.company.id,
+                # 'partner_id': self.source_id.partner_id.id,
+                # 'location_dest_id': self.env.ref('stock.picking_type_internal').id,
+
+            })
+            # self.picking_id = picking_source_id
+            move = self.env['stock.move'].create({
+                'name': lots.product_id.name,
+                'product_id': lots.product_id.id,
+                'product_uom_qty': lots.product_qty,
+                'product_uom': lots.product_uom_id.id,
+                'picking_id': picking_source_id.id,
+                'location_id': lots.src_warehouse_id.lot_stock_id.id,
+                'location_dest_id': production_location.id,
+                # 'location_id': self.env.ref('stock.stock_location_stock').id,
+                # 'location_dest_id': self.env.ref('stock.picking_type_internal').id,
+                # self.env.ref('stock.picking_type_internal').id,
+            })
+            move_line_id = self.env['stock.move.line'].create(move._prepare_move_line_vals())
+
+            for line in move_line_id:
+                line.lot_id = lots.lot_id.id
+                line.lot_name = lots.lot_id.name
+                line.qty_done = lots.product_qty
+            picking_source_id.button_validate()
+
+            lots.lot_id.stock_status = 'not_available'
+            lots.lot_status = 'not_available'
+            lots.lot_id.process_done = 'slitting'
+            if self.operation == 'annealing':
+                lots.lot_id.is_annealed = 'yes'
+
+            # self.lot_id.stock_status = 'not_available'
+
+        if self.multi_stage_line_ids:
+            product = []
+            for line in self.multi_stage_line_ids:
+                if not line.is_scrap:
+                    product.append(line)
+            finished_picking = self.env['stock.picking'].create({
+                'location_id': production_location.id,
+                'location_dest_id': self.dest_warehouse_id.lot_stock_id.id,
+                'picking_type_id': dest_picking_type.id,
+                'company_id': self.env.company.id,
+                # 'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                # 'picking_type_id': self.env.ref('stock.picking_type_internal').id,
+                # 'partner_id': self.source_id.partner_id.id,
+                # 'location_id': self.env.ref('stock.picking_type_internal').id,
+
+            })
+            self.finished_picking_id = finished_picking.id
+
+            for products in product:
+                move_lines_list = []
+                new_move_list = []
+                status_stock = ''
+                i = bundle_quantity = 0
+                sheet_numbers = 0
+
+                if products.product_qty:
+                    move = self.env['stock.move'].create({
+                        'name': products.product_id.name,
+                        'product_id': products.product_id.id,
+                        'product_uom_qty': products.product_qty,
+                        'product_uom': products.product_uom_id.id,
+                        'picking_id': finished_picking.id,
+                        # 'location_id': self.env.ref('stock.picking_type_internal').id,
+                        'location_id': production_location.id,
+                        'location_dest_id': self.dest_warehouse_id.lot_stock_id.id,
+                        # 'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+
+                    })
+                    self.finished_move_id = move.id
+                lot_ids = []
+                # sequence = self.env['ir.sequence'].next_by_code('stock.lot.serial.custom')
+                rounding = products.product_uom_id.rounding
+                qty = float_round(products.product_qty, precision_rounding=rounding)
+
+                status_stock = 'available'
+
+                new_lots = self.env['stock.production.lot'].with_context({'baby_lot': True}). \
+                    create(
+                    {'name': _('New'),
+                     'product_id': products.product_id.id,
+                     'company_id': self.env.company.id,
+                     'sub_category_id': products.product_id.categ_id.id,
+                     'category_id': products.product_id.categ_id.parent_id.id,
+                     'product_qty': qty,
+                     'weight_lb': products.product_qty,
+                     'product_uom_id': products.product_uom_id.id,
+                     'thickness_in': products.thickness_in,
+                     'width_in': products.width_in,
+                     'length_in': products.length_in if products.material_type == 'sheets' else 0,
+                     'material_type': products.material_type,
+                     'number_of_sheets': products.number_of_sheets if products.material_type == 'sheets' else 0,
+                     'is_child_coil': True,
+                     'parent_coil_id': products.lot_id.id,
+                     'stock_status': status_stock,
+                     'bill_of_lading': products.lot_id.bill_of_lading,
+                     'vendor_id': products.lot_id.vendor_id.id if products.lot_id.vendor_id else False,
+                     # 'vendor_location_id': products.lot_id.vendor_location_id.id if products.lot_id.vendor_location_id else False,
+                     'vendor_serial_number': products.lot_id.vendor_serial_number,
+                     'thickness_spec': products.lot_id.thickness_spec,
+                     'rockwell': products.lot_id.rockwell,
+                     'yield_mpa': products.lot_id.yield_mpa,
+                     'elongation': products.lot_id.elongation,
+                     'tensile_mpa': products.lot_id.tensile_mpa,
+                     'date_received': products.lot_id.date_received,
+
+                     'internet_serial': products.lot_id.internet_serial,
+                     'packing_slip_no': products.lot_id.packing_slip_no,
+                     'comp_c': products.lot_id.comp_c,
+                     'comp_mn': products.lot_id.comp_mn,
+                     'comp_p': products.lot_id.comp_p,
+                     'comp_s': products.lot_id.comp_s,
+                     'comp_si': products.lot_id.comp_si,
+                     'comp_al': products.lot_id.comp_al,
+                     'comp_cr': products.lot_id.comp_cr,
+                     'comp_nb': products.lot_id.comp_nb,
+                     'comp_ti': products.lot_id.comp_ti,
+                     'comp_ca': products.lot_id.comp_ca,
+                     'comp_n': products.lot_id.comp_n,
+                     'comp_ni': products.lot_id.comp_ni,
+                     'comp_cu': products.lot_id.comp_cu,
+                     'comp_v': products.lot_id.comp_v,
+                     'comp_b': products.lot_id.comp_b,
+                     'pass_oil': products.lot_id.pass_oil,
+                     'finish': products.lot_id.finish,
+                     'temper': products.lot_id.temper,
+                     'category': products.lot_id.category,
+                     'coating': products.lot_id.coating,
+                     'heat_number': products.lot_id.heat_number,
+                     'lift_number': products.lot_id.lift_number,
+                     'part_number': products.lot_id.part_number,
+                     'tag_number': products.lot_id.tag_number,
+                     'grade': products.lot_id.grade,
+                     'quality': products.lot_id.quality,
+                     'loc_city': self.dest_warehouse_id.lot_stock_id.id,
+                     'loc_warehouse': self.dest_warehouse_id.id,
+                     # 'loc_city': self.env.ref('stock.stock_location_stock').id,
+                     # 'loc_warehouse': dest_wh.id,
+                     'po_number': products.lot_id.po_number,
+                     'is_annealed': 'yes' if self.operation == 'annealing' else 'no',
+                     'purchase_cost': products.lot_id.purchase_cost + products.lot_id.landed_cost,
+                     'total_purcahse_cost': (products.lot_id.purchase_cost + products.lot_id.landed_cost) * qty,
+
+                     })
+                new_lots._onchange_width()
+                new_lots._onchange_thickness()
+                new_lots._onchange_length()
+                lot_ids.append(new_lots)
+                products.finished_lot_id = new_lots.id
+                products.lot_status = new_lots.stock_status
+                move_line_id = self.env['stock.move.line'].create(
+                    move._prepare_move_line_vals())
+
+                for line in move_line_id:
+                    line.lot_id = new_lots.id
+                    line.qty_done = qty
+                    new_move_list = line.id
+            try:
+                finished_picking.action_confirm()
+            except:
+                pass
+            finished_picking.with_context({'baby_lot': True}).button_validate()
+            # self.write({'state': 'done'})
+            # self.lot_status = 'not_available'
+            # if self.sale_order_id:
+            #     print('fg')
+            #     return self.action_create_picking()
+
     def create_picking(self):
         # line_weight = sum(self.mapped('production_line_ids').mapped('product_qty'))
         # if line_weight > self.product_qty:
@@ -758,90 +1185,6 @@ class SteelProduction(models.Model):
             if self.sale_order_id:
                 print('fg')
                 return self.action_create_picking()
-
-        #     'reserved' if products.is_balance == False else 'available',
-        # bundles
-        # if products.material_type == 'sheets' and products.bundles > 1:
-        #     bundle_quant = qty / products.bundles
-        #     bundle_quantity = float_round(bundle_quant, precision_rounding=rounding)
-        #     sheet_numbers = products.number_of_sheets / products.bundles
-        #
-        #     while i < products.bundles:
-        #
-        #         new_lots = self.env['stock.production.lot'].with_context({'baby_lot': True}). \
-        #             create(
-        #             {'name': _('New'),
-        #              'product_id': products.product_id.id,
-        #              'company_id': self.env.company.id,
-        #              'sub_category_id': products.product_id.categ_id.id,
-        #              'category_id': products.product_id.categ_id.parent_id.id,
-        #              'product_qty': bundle_quantity,
-        #              'product_uom_id': products.product_uom_id.id,
-        #              'thickness_in': products.thickness_in,
-        #              'width_in': products.width_in,
-        #              'length_in': products.length_in if products.material_type == 'sheets' else 0,
-        #              'material_type': products.material_type,
-        #              'number_of_sheets': sheet_numbers,
-        #              'is_child_coil': True,
-        #              'parent_coil_id': self.lot_id.id,
-        #              'stock_status': status_stock,
-        #              'bill_of_lading': self.lot_id.bill_of_lading,
-        #              'vendor_id': self.lot_id.vendor_id.id if self.lot_id.vendor_id else False,
-        #              'vendor_location_id': self.lot_id.vendor_location_id.id if self.lot_id.vendor_location_id else False,
-        #              'vendor_serial_number': self.lot_id.vendor_serial_number,
-        #              'thickness_spec': self.lot_id.thickness_spec,
-        #              'rockwell': self.lot_id.rockwell,
-        #              'yield_mpa': self.lot_id.yield_mpa,
-        #              'elongation': self.lot_id.elongation,
-        #              'tensile_mpa': self.lot_id.tensile_mpa,
-        #              'date_received': self.lot_id.date_received,
-        #              'po_number': self.lot_id.po_number,
-        #              'internet_serial': self.lot_id.internet_serial,
-        #              'packing_slip_no': self.lot_id.packing_slip_no,
-        #              'comp_c': self.lot_id.comp_c,
-        #              'comp_mn': self.lot_id.comp_mn,
-        #              'comp_p': self.lot_id.comp_p,
-        #              'comp_s': self.lot_id.comp_s,
-        #              'comp_si': self.lot_id.comp_si,
-        #              'comp_al': self.lot_id.comp_al,
-        #              'comp_cr': self.lot_id.comp_cr,
-        #              'comp_nb': self.lot_id.comp_nb,
-        #              'comp_ti': self.lot_id.comp_ti,
-        #              'comp_ca': self.lot_id.comp_ca,
-        #              'comp_n': self.lot_id.comp_n,
-        #              'comp_ni': self.lot_id.comp_ni,
-        #              'comp_cu': self.lot_id.comp_cu,
-        #              'comp_v': self.lot_id.comp_v,
-        #              'comp_b': self.lot_id.comp_b,
-        #              'pass_oil': self.lot_id.pass_oil,
-        #              'finish': self.lot_id.finish,
-        #              'temper': self.lot_id.temper,
-        #              'category': self.lot_id.category,
-        #              'coating': self.lot_id.coating,
-        #              'heat_number': self.lot_id.heat_number,
-        #              'lift_number': self.lot_id.lift_number,
-        #              'part_number': self.lot_id.part_number,
-        #              'tag_number': self.lot_id.tag_number,
-        #              'grade': self.lot_id.grade,
-        #              'quality': self.lot_id.quality,
-        #
-        #              })
-        #         new_lots._onchange_width()
-        #         new_lots._onchange_thickness()
-        #         new_lots._onchange_length()
-        #         lot_ids.append(new_lots)
-        #         products.bundle_lot_ids = [(4, new_lots.id)]
-        #         products.lot_status = new_lots.stock_status
-        #         move_line_id = self.env['stock.move.line'].create(
-        #             move._prepare_move_line_vals())
-        #
-        #         for line in move_line_id:
-        #             line.lot_id = new_lots.id
-        #             line.qty_done = bundle_quantity
-        #             new_move_list = line.id
-        #         i += 1
-        #
-        # else:
 
     def action_view_stock_pickings(self):
         picking_id_list = []
@@ -1136,9 +1479,10 @@ class MultiStageLine(models.Model):
                 self.product_qty = int(unit_weight * self.width_in)
 
     lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Source", track_visibility='onchange')
-    # finished_lot_id = fields.Many2one(comodel_name='stock.production.lot', string="New Lot",
-    #                                   track_visibility='onchange')
+    finished_lot_id = fields.Many2one(comodel_name='stock.production.lot', string="New Tag No",
+                                      track_visibility='onchange')
     is_balance = fields.Boolean(string='Is Balance', default=False, copy=False)
+    is_scrap = fields.Boolean(string='Is Scrap', default=False, copy=False)
     material_type = fields.Selection([
         ('coil', 'Coil'),
         ('sheets', 'Sheets'),
@@ -1152,6 +1496,49 @@ class MultiStageLine(models.Model):
     thickness_in = fields.Float(string='Thickness(in)', digits=[6, 4])
     product_uom_id = fields.Many2one('uom.uom', string='Uom')
     production_stage_id = fields.Many2one('steel.production', string='Production Ref')
+    remarks = fields.Selection([
+        ('restock', 'Restock'),
+        ('run2', 'Send for 2nd run'),
+        ('scrap', 'Scrap Wt')
+    ], string='Remarks')
+
+    def action_production_order_line(self):
+        production_lines = []
+        if self.finished_lot_id:
+            self.production_stage_id.second_run_lot_id = self.finished_lot_id.id
+
+            for line in self:
+                production_lines.append((0, 0, {
+                    'lot_id': line.finished_lot_id.id,
+                    'product_id': line.finished_lot_id.product_id.id,
+                    'category_id': line.finished_lot_id.category_id.id,
+                    'sub_category_id': line.finished_lot_id.sub_category_id.id,
+                    'product_uom_id': line.finished_lot_id.product_uom_id.id,
+                    'thickness_in': line.thickness_in,
+                    'product_qty': line.product_qty,
+                    'width_in': line.width_in,
+                    # 'remarks': line.remarks,
+                    # 'is_scrap': line.is_scrap,
+                    # 'material_type': 'coil',
+                    # 'src_warehouse_id': self.lot_id.loc_warehouse.id,
+
+                }))
+            action = {
+                'type': 'ir.actions.act_window',
+                'views': [(self.env.ref('odx_steel_production.second_run_wizard_view').id, 'form')],
+                'view_mode': 'form',
+                'context': {'default_line_order_ids': production_lines,
+                            'default_multi_stage_id': self.id,
+                            'default_production_id': self.production_stage_id.id,
+                            'default_source_lot_id': self.finished_lot_id.id
+                            },
+                'target': 'new',
+                'name': _('Second Run'),
+                'res_model': 'second.run.wizard', }
+            return action
+        else:
+            raise UserError(_('Please click create picking and generate lot.'))
+
     # number_of_sheets = fields.Float(string='Sheets')
     # length_in = fields.Float(string='Length(in)', digits=[8, 4])
     # lot_status = fields.Selection([

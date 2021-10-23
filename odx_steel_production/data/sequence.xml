@@ -22,6 +22,19 @@
             <field name="prefix">SK/</field>
             <field name="padding">4</field>
         </record>
+         <record id="production_instruction_sequence" model="ir.sequence">
+            <field name="name">Production Instruction</field>
+            <field name="code">production.instruction.sequence</field>
+            <field name="prefix">WO/</field>
+            <field name="padding">4</field>
+        </record>
+        <record id="production_run_sequence" model="ir.sequence">
+            <field name="name">Production Run Sequence</field>
+            <field name="code">production.run.sequence</field>
+            <field name="prefix">PR-</field>
+            <field name="padding">4</field>
+        </record>
+
         <!--bnnnnnnn-->
     </data>
 </odoo>

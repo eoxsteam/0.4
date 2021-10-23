@@ -25,12 +25,11 @@ class MultiLotLine(models.Model):
     sub_category_id = fields.Many2one('product.category', string="Sub Category")
     product_id = fields.Many2one('product.product', string='Sub Product')
     product_qty = fields.Float(string='Weight')
-    width_in = fields.Float(string='Width(in)',digits=[6, 4])
+    width_in = fields.Float(string='Width(in)', digits=[6, 4])
     thickness_in = fields.Float(string='Thickness(in)', digits=[6, 4])
     product_uom_id = fields.Many2one('uom.uom', string='Uom')
     job_order_ref_id = fields.Many2one('job.order', string='Job Ref')
-    src_warehouse_id = fields.Many2one('stock.warehouse', 'Source WH',
-                                       required=True)
+    src_warehouse_id = fields.Many2one('stock.warehouse', 'Source WH', required=True)
     number_of_parts = fields.Integer(string='No.Of Parts')
     number_of_bundles = fields.Integer(string='No.Of Bundles', default=1)
     number_of_slits = fields.Integer(string='No.Of Slits', default=1)
@@ -106,7 +105,7 @@ class MultiLotLine(models.Model):
                                 'product_uom_id': self.product_uom_id.id,
                                 'thickness_in': self.thickness_in,
                                 'material_type': 'coil',
-                                'width_in': self.width_in/self.number_of_slits,
+                                'width_in': self.width_in / self.number_of_slits,
 
                             })]
                         })
@@ -172,4 +171,3 @@ class MultiLotLine(models.Model):
 
                     })]
                 })
-
