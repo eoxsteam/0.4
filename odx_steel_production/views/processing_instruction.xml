@@ -55,6 +55,10 @@
                                 <field name="scrap_percent"/>
                             </group>
                         </group>
+                        <div class="alert alert-warning" role="alert"
+                            attrs="{'invisible': [('warning_message','=',False)]}">
+                            <field name="warning_message"/>
+                        </div>
                         <notebook>
                             <page string="Production Runs">
                                 <br/>
@@ -94,8 +98,6 @@
                                                     <field name="lot_id"
                                                            attrs="{'readonly': [('parent.send_for_production', '!=', False)]}"
                                                            string="Tag #"/>
-
-
                                                     <field name="category_id" readonly="1" optional="hide"
                                                            force_save="1"/>
                                                     <field name="sub_category_id" readonly="1" force_save="1"/>
@@ -106,6 +108,8 @@
                                                            widget="integer"/>
                                                     <field name="no_of_slits" string="No. of Slits"
                                                            attrs="{'column_invisible': [('parent.operation', 'not in', ('slitting'))],'readonly':[('parent.send_for_production','!=', False)]}"/>
+                                                    <field name="no_of_parts" string="No. of Parts"
+                                                           attrs="{'column_invisible': [('parent.operation', 'not in', ('parting'))],'readonly':[('parent.send_for_production','!=', False)]}"/>
                                                     <field name="no_of_bundles" string="No. of Bundles"
                                                            attrs="{'column_invisible': [('parent.operation', 'not in', ('cutting'))],'readonly':[('parent.send_for_production','!=', False)]}"/>
                                                     <field name="product_uom_id" readonly="1" optional="hide"
@@ -165,6 +169,9 @@
                                                         </tree>
                                                     </field>
                                                 </page>
+                                                <page string="Instructions">
+                                                    <field name="pr_instructions"/>
+                                                </page>
                                             </notebook>
                                             <button name="create_production" string="Create Production"
                                                     type="object" style="float:right;" class="btn-primary"
@@ -196,7 +203,7 @@
         <menuitem id="menu_work_order" name="Work Order" action="action_processing_instructions"
                   sequence="28" web_icon="odx_steel_production,static/description/production.png"
                   groups="odx_steel_production.group_production_view_access"/>
-<!--        <field name="groups_id" eval="[(6,0, [ref('odx_steel_production.group_production_view_access')])]"/>/>-->
+        <!--        <field name="groups_id" eval="[(6,0, [ref('odx_steel_production.group_production_view_access')])]"/>/>-->
 
         <menuitem
                 id="menu_production_processing_instructions"

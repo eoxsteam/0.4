@@ -23,6 +23,7 @@
         'views/back_end.xml',
         'views/processing_instruction.xml',
         'views/master.xml',
+        'views/production_run.xml',
         # 'views/stock_valuation.xml',
         'reports/barcode_production.xml',
         'reports/barcode_job_order.xml',

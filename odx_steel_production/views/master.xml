@@ -26,6 +26,22 @@
 
                             </group>
                         </group>
+                        <notebook>
+                            <page string="Scheduler">
+
+                                <field name="machine_scheduler_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="start_time"/>
+                                        <field name="end_time"/>
+                                        <field name="work_order_id"/>
+                                        <field name="pr_run_id"/>
+                                        <field name="machine_id" invisible="1"/>
+                                    </tree>
+                                </field>
+
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>

@@ -29,6 +29,7 @@ class ProductionInstructions(models.Model):
     ], string='State', default='draft')
     production_count = fields.Integer(string="Count", compute="_compute_production_count")
     scrap_percent = fields.Float(string="Scrap %", compute='total_scrap_percent')
+    warning_message = fields.Char(string='Warning', readonly=True, compute='show_warning_message')
 
     def total_scrap_percent(self):
         for rec in self:
@@ -90,6 +91,14 @@ class ProductionInstructions(models.Model):
         #     # 'default_group_by_sale_line_id': 1
         # }
 
+    def show_warning_message(self):
+        for rec in self:
+            if rec.scrap_percent > 3:
+                rec.warning_message = _(
+                    "Total scrap percentage exceeded the scrap limit")
+            else:
+                rec.warning_message = False
+
 
 class InstructionsRunLine(models.Model):
     _name = 'instructions.run.line'
@@ -114,11 +123,13 @@ class InstructionsRunLine(models.Model):
     operation = fields.Selection([
         ('slitting', 'Slitting'),
         ('cutting', 'Cut to Length'),
+        ('parting', 'Re-Winding'),
     ], string='Operation', required=True, default='slitting')
     production_ids = fields.One2many('steel.production', 'instruction_line_id', string='Production Orders')
     machine_id = fields.Many2one('production.machine', string='Machine')
     scrap_percent = fields.Float(string='Scrap %', compute='calculate_scrap_percent')
     total_scrap_wt = fields.Float(string='Scrap Weight', compute='calculate_scrap_weight')
+    pr_instructions = fields.Html(string='Instructions')
 
     def add_scrap_line(self):
         if self.operation == 'cutting':
@@ -150,6 +161,36 @@ class InstructionsRunLine(models.Model):
 
                         })]
                     })
+        if self.operation == 'parting':
+            for tags in self.instruction_run_line_ids:
+                balance_wt = balance_width = 0
+                line_weight = 0
+                line_width = 0
+                for lines in self.tag_line_ids:
+                    if tags.lot_id == lines.lot_id:
+                        line_weight += lines.product_qty
+                        # line_width += lines.width_in
+
+                balance_wt = tags.product_qty - line_weight
+                # balance_width = tags.width_in - line_width
+                if line_weight < tags.product_qty:
+                    self.write({
+                        'tag_line_ids': [(0, 0, {
+                            'lot_id': tags.lot_id.id,
+                            'product_id': tags.product_id.id,
+                            'category_id': tags.category_id.id,
+                            'sub_category_id': tags.sub_category_id.id,
+                            'product_qty': balance_wt,
+                            'width_in': tags.width_in,
+                            'product_uom_id': tags.product_uom_id.id,
+                            'thickness_in': tags.thickness_in,
+                            # 'lot_status': 'available',
+                            'material_type': 'sheets',
+                            'is_scrap': True,
+
+                        })]
+                    })
+
         if self.operation == 'slitting':
             for tags in self.instruction_run_line_ids:
                 balance_wt = balance_width = 0
@@ -491,8 +532,9 @@ class ProductionInstructionsTag(models.Model):
     product_uom_id = fields.Many2one('uom.uom', string='Uom')
     tagline_ref_id = fields.Many2one('production.instructions.tag.line', string='Tag Line Ref')
     instruction_line_id = fields.Many2one('instructions.run.line', string='Instruction Line Ref')
-    no_of_slits = fields.Integer(string="Number of Slits")
-    no_of_bundles = fields.Integer(string="Number of Bundles")
+    no_of_slits = fields.Integer(string="No. of Slits")
+    no_of_bundles = fields.Integer(string="No. of Bundles")
+    no_of_parts = fields.Integer(string="No. of Parts")
     src_warehouse_id = fields.Many2one('stock.warehouse', 'Source WH', required=True)
     lot_status = fields.Selection([
         ('transit', 'In Transit'),
@@ -548,6 +590,23 @@ class ProductionInstructionsTag(models.Model):
                                 'width_in': self.width_in,
                                 # 'product_qty': int(self.product_qty / self.no_of_slits),
                                 'material_type': 'sheets',
+                            })]
+                        })
+                        i += 1
+            if self.instruction_line_id.operation == 'parting':
+                if self.no_of_parts > 0:
+                    while i < self.no_of_parts:
+                        self.instruction_line_id.write({
+                            'tag_line_ids': [(0, 0, {
+                                'lot_id': self.lot_id.id,
+                                'category_id': self.lot_id.category_id.id,
+                                'sub_category_id': self.lot_id.sub_category_id.id,
+                                'product_id': self.lot_id.product_id.id,
+                                'product_uom_id': self.lot_id.product_uom_id.id,
+                                'thickness_in': self.lot_id.thickness_in,
+                                'width_in': self.width_in,
+                                'product_qty': int(self.product_qty / self.no_of_parts),
+                                'material_type': 'coil',
                             })]
                         })
                         i += 1
