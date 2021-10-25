@@ -393,8 +393,10 @@ class KsCurvedBackendTheme(http.Controller):
         :return: dict of top12 frequently used app by user
         """
         user_id = request.env.user
-        menu_ids = user_id.ks_frequency_menu.search_read([('ks_user_id', '=', user_id.id)], ['ks_menu_id'], limit=12,
+        menu_ids = user_id.ks_frequency_menu.search_read([('ks_user_id', '=', user_id.id)],limit=12,
                                                          order='ks_frequency desc')
+#['ks_menu_id'], 
+
         return [menu['ks_menu_id'][0] for menu in menu_ids]
 
     # Todo: If no use then remove this function.
