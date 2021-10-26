@@ -19,12 +19,12 @@
             <field name="arch" type="xml">
                 <form string="Work Order">
                     <header>
-                        <button name="add_number_of_runs" string="Add Run"
-                                class="oe_highlight" type="object" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+
                         <button name="confirm_prd" string="Confirm"
                                 class="oe_highlight" type="object" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,done,produced"/>
                     </header>
+                    <!--                    options="{'datepicker': {'warn_future': true}}"-->
                     <sheet>
                         <div class="oe_button_box" name="button_box">
                             <button type="object"
@@ -52,18 +52,36 @@
                             </group>
                             <group>
                                 <field name="due_date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                <field name="scrap_percent"/>
+
                             </group>
                         </group>
-                        <div class="alert alert-warning" role="alert"
-                            attrs="{'invisible': [('warning_message','=',False)]}">
-                            <field name="warning_message"/>
+                        <div style="margin-left:50%">
+                            <label for="scrap_percent"/>
+                            <field name="scrap_percent"/>
+                            <span>&#160;</span>
+                            <button
+                                    help="Scrap weight exceeded the scrap limit"
+                                    attrs="{'invisible': [('warning_message','=',False)]}" style="margin-left:5px;">
+                                <i class="fa fa-exclamation-triangle" style="color:red;"/>
+                            </button>
+                            <button name="add_number_of_runs" string="Add Run"
+                                    class="oe_highlight" type="object" style="margin-left:30px;"
+                                    attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+
                         </div>
+                        <div class="alert alert-warning" role="alert" invisible="1">
+                            <field name="warning_message" invisible="1"/>
+                        </div>
+                        <!--                        <div class="alert alert-warning" role="alert"
+                                                     attrs="{'invisible': [('warning_message','=',False)]}">
+                                                    <field name="warning_message"/>
+                                                </div>-->
                         <notebook>
                             <page string="Production Runs">
                                 <br/>
-                                <field name="run_line_ids" nolabel="1">
-                                    <tree create="false">
+                                <field name="run_line_ids" nolabel="1"
+                                       context="{'default_prod_inst_ref_id': active_id}">
+                                    <tree>
                                         <field name="name" readonly="1"/>
                                         <field name="send_for_production"/>
                                         <field name="operation"/>
@@ -85,13 +103,26 @@
                                                     <field name="send_for_production" invisible="1"/>
                                                     <field name="operation"
                                                            attrs="{'readonly': [('send_for_production', '!=', False)]}"/>
-                                                    <field name="scrap_percent"/>
+
                                                     <field name="total_scrap_wt" invisible="0"/>
                                                     <field name="prod_inst_ref_id" invisible="1"/>
                                                     <field name="production_ref_id" invisible="1"/>
                                                     <field name="production_ids" invisible="1"/>
                                                 </group>
                                             </group>
+                                            <div style="margin-left:50%">
+                                                <label for="scrap_percent"/>
+                                                 <field name="scrap_percent"/>
+                                                <span>&#160;</span>
+                                                <button
+                                                        help="Scrap weight exceeded the scrap limit"
+                                                        attrs="{'invisible': [('warning_message','=',False)]}"
+                                                        style="margin-left:5px;">
+                                                    <i class="fa fa-exclamation-triangle" style="color:red;"/>
+                                                </button>
+                                                 <field name="warning_message" invisible="1"/>
+                                            </div>
+                                            <br/>
 
                                             <field name="instruction_run_line_ids" nolabel="1">
                                                 <tree editable="bottom">
@@ -158,14 +189,21 @@
                                                             <field name="product_uom_id" readonly="1" optional="hide"/>
                                                             <field name="material_type" optional="hide" readonly="1"
                                                                    force_save="1"/>
-                                                            <field name="action"/>
-                                                            <field name="lot_status"/>
+                                                            <field name="action"
+                                                                   attrs="{'readonly':[('is_scrap','!=', False)]}"/>
+                                                            <field name="lot_status" readonly="1"/>
                                                             <field name="instruction_ref_line_id" invisible="1"/>
                                                             <field name="is_scrap" optional="hide"/>
+                                                            <field name="so_line_updated" invisible="1"/>
+                                                            <field name="sale_order_id" options="{'no_create_edit': True}"
+                                                                   attrs="{'readonly':['|',('is_scrap','!=', False),('action', '!=', 'finished_goods')]}"/>
+                                                            <!--                                                             attrs="{'readonly':[('is_scrap','!=', False)],'column_invisible': [('action', '!=', 'finished_goods')]}"-->
+                                                            <field name="order_line_id" options="{'no_create_edit': True, 'no_open': True}"
+                                                                   attrs="{'readonly':['|',('is_scrap','!=', False),('action', '!=', 'finished_goods')]}"/>
                                                             <button name="add_to_sale_order" string="Add to SO"
                                                                     type="object"
                                                                     class="btn-primary"
-                                                                    attrs="{'invisible': [('action', '!=', 'finished_goods')]}"/>
+                                                                    attrs="{'invisible': ['|','|',('action', '!=', 'finished_goods'),('parent.send_for_production','=', False),('so_line_updated','!=',False)]}"/>
                                                         </tree>
                                                     </field>
                                                 </page>

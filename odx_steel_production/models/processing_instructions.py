@@ -130,6 +130,15 @@ class InstructionsRunLine(models.Model):
     scrap_percent = fields.Float(string='Scrap %', compute='calculate_scrap_percent')
     total_scrap_wt = fields.Float(string='Scrap Weight', compute='calculate_scrap_weight')
     pr_instructions = fields.Html(string='Instructions')
+    warning_message = fields.Char(string='Warning', readonly=True, compute='show_warning_message')
+
+    def show_warning_message(self):
+        for rec in self:
+            if rec.scrap_percent > 3:
+                rec.warning_message = _(
+                    "Total scrap percentage exceeded the scrap limit")
+            else:
+                rec.warning_message = False
 
     def add_scrap_line(self):
         if self.operation == 'cutting':
@@ -248,7 +257,20 @@ class InstructionsRunLine(models.Model):
     def save_form(self):
         # self.write(vals)
         # self.prod_inst_ref_id.write()
+        # self.env.cr.commit()
         return self.id
+        # self.prod_inst_ref_id.env.cr.commit()
+        # return {
+        #     'name': _('Import CRD'),
+        #     'type': 'ir.actions.act_window',
+        #     'view_mode': 'form',
+        #     'res_model': 'instructions.run.line',
+        #     'res_id': self.id,
+        #     # 'target': 'new',
+        #     # 'views': [(False, 'form')],
+        #     # 'view_id': False,
+        # }
+
 
     def create_production(self):
         production_obj = self.env['steel.production']
@@ -632,6 +654,11 @@ class ProductionInstructionsTagLine(models.Model):
     # instruction_tag_ref = fields.Many2one('production.instructions.tag', string='Instructions Tag Ref')
     # inst_ref_id = fields.Many2one('production.instructions', string='Instructions Ref')
     is_scrap = fields.Boolean(string='Scrap Weight', default=False, copy=False)
+    sale_order_id = fields.Many2one('sale.order', string='SO', copy=False,
+                                    domain="[('state', '=', 'draft')]")
+    order_line_id = fields.Many2one('sale.order.line', string='OrderLine', copy=False,
+                                    domain="[('order_id', '=', sale_order_id) or [] ]")
+    so_line_updated = fields.Boolean('Orderline Updated')
     material_type = fields.Selection([
         ('coil', 'Coil'),
         ('sheets', 'Sheets'),
@@ -670,4 +697,35 @@ class ProductionInstructionsTagLine(models.Model):
             self.product_qty = int(unit_sheet_weight * self.number_of_sheets)
 
     def add_to_sale_order(self):
-        pass
+        if self.sale_order_id:
+            if self.order_line_id:
+                self.order_line_id.write({
+                    'lot_id': self.finished_lot_id.id,
+                    'category_id': self.finished_lot_id.category_id.id,
+                    'sub_category_id': self.finished_lot_id.sub_category_id.id,
+                    'product_id': self.finished_lot_id.product_id.id,
+                    'product_uom': self.finished_lot_id.product_uom_id.id,
+                    'thickness_in': self.finished_lot_id.thickness_in,
+                    'width_in': self.width_in,
+                    'length_in': self.length_in,
+                    'product_uom_qty': self.finished_lot_id.product_qty,
+                    'material_type': self.material_type,
+                })
+                self.so_line_updated=True
+            else:
+                self.sale_order_id.sudo().write({
+                    'order_line': [(0, 0, {
+                        'order_id': self.order_line_id.id,
+                        'lot_id': self.finished_lot_id.id,
+                        'product_id': self.finished_lot_id.product_id.id,
+                        'category_id': self.finished_lot_id.category_id.id,
+                        'sub_category_id': self.finished_lot_id.sub_category_id.id,
+                        'product_uom_qty': self.finished_lot_id.product_qty,
+                        'product_uom': self.finished_lot_id.product_uom_id.id,
+                        'thickness_in': self.thickness_in,
+                        'width_in': self.width_in,
+                        'length_in': self.length_in,
+                        'material_type': self.material_type
+                    })]
+                })
+                self.so_line_updated = True
