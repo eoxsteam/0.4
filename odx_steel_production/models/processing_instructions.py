@@ -15,9 +15,9 @@ class ProductionInstructions(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code('production.instruction.sequence') or _('New')
         return super(ProductionInstructions, self).create(vals)
 
-    date = fields.Date(string="Creation Date")
+    date = fields.Date(string="Creation Date", default=fields.Date.today)
     due_date = fields.Date(string="Due Date")
-    name = fields.Char(string="Serial #")
+    name = fields.Char(string="WO #")
 
     number_of_productions = fields.Integer(string="No. of Productions")
     run_line_ids = fields.One2many('instructions.run.line', 'prod_inst_ref_id', string="Instruction Line")
@@ -271,7 +271,6 @@ class InstructionsRunLine(models.Model):
         #     # 'view_id': False,
         # }
 
-
     def create_production(self):
         production_obj = self.env['steel.production']
         company = self.env.company.id
@@ -353,6 +352,34 @@ class InstructionsRunLine(models.Model):
         raise UserError(_("A Production is already generated"))
 
     def create_picking(self):
+        # if self.instruction_run_line_ids:
+        #     if self.operation == 'slitting' or self.operation == 'parting':
+        #         for source_tag in self.instruction_run_line_ids:
+        #             line_width = line_weight = residue_width = residue_weight = 0
+        #             for line_tag in self.tag_line_ids:
+        #                 if line_tag.lot_id == source_tag.lot_id:
+        #                     line_width += line_tag.width_in
+        #                     line_weight += line_tag.product_qty
+        #
+        #             if line_width > source_tag.width_in:
+        #                 raise UserError(_("Sum of the widths exceeded the Coil Width for %s" % source_tag.lot_id.name))
+        #             if line_weight > source_tag.product_qty:
+        #                 raise UserError(_("Sum of the weights exceeded the Coil Weight for %s" % source_tag.lot_id.name))
+        #
+        #     if self.operation == 'cutting':
+        #         for source_tag in self.instruction_run_line_ids:
+        #             line_width = line_weight = residue_width = residue_weight = 0
+        #             for line_tag in self.tag_line_ids:
+        #                 if line_tag.lot_id == source_tag.lot_id:
+        #                     # line_width += line_tag.width_in
+        #                     line_weight += line_tag.product_qty
+        #
+        #             # if line_width > source_tag.width_in:
+        #             #     raise UserError(_("Sum of the widths exceeded the Coil Width for %s" % source_tag.lot_id.name))
+        #             if line_weight > source_tag.product_qty:
+        #                 raise UserError(
+        #                     _("Sum of the weights exceeded the Coil Weight for %s" % source_tag.lot_id.name))
+
         picking_type = self.env['stock.picking.type'].search(
             [('code', '=', 'internal'), ('company_id', '=', self.env.company.id)])
         production_location = self.env['stock.location'].search([('usage', '=', 'production'),
@@ -547,7 +574,7 @@ class ProductionInstructionsTag(models.Model):
                              domain=[('material_type', '=', 'coil'), ('stock_status', '=', 'available'), ])
     category_id = fields.Many2one('product.category', string="Master", domain="[('parent_id', '=', False)]")
     sub_category_id = fields.Many2one('product.category', string="Sub Category")
-    product_id = fields.Many2one('product.product', string='Sub Product')
+    product_id = fields.Many2one('product.product', string='Product')
     product_qty = fields.Float(string='Weight')
     width_in = fields.Float(string='Width(in)', digits=[6, 4])
     thickness_in = fields.Float(string='Thickness(in)', digits=[6, 4])
@@ -643,9 +670,9 @@ class ProductionInstructionsTagLine(models.Model):
     finished_lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Lot", )
     category_id = fields.Many2one('product.category', string="Master", domain="[('parent_id', '=', False)]")
     sub_category_id = fields.Many2one('product.category', string="Sub Category")
-    product_id = fields.Many2one('product.product', string='Sub Product')
+    product_id = fields.Many2one('product.product', string='Product')
     product_qty = fields.Float(string='Weight')
-    width_in = fields.Float(string='Width(in) to be cut', digits=[6, 4])
+    width_in = fields.Float(string='Width(in)', digits=[6, 4])
     number_of_sheets = fields.Integer(string='Sheets')
     length_in = fields.Float(string='Length(in)', digits=[8, 4])
     thickness_in = fields.Float(string='Thickness(in)', digits=[6, 4])
@@ -665,7 +692,7 @@ class ProductionInstructionsTagLine(models.Model):
     ], string='Material Type')
     action = fields.Selection([
         ('restock', 'Restock'),
-        ('reslit', 'Re-Slit'),
+        ('reslit', 'Re-Run'),
         ('finished_goods', 'Finished Goods'),
     ], string='Action')
     lot_status = fields.Selection([
@@ -711,7 +738,7 @@ class ProductionInstructionsTagLine(models.Model):
                     'product_uom_qty': self.finished_lot_id.product_qty,
                     'material_type': self.material_type,
                 })
-                self.so_line_updated=True
+                self.so_line_updated = True
             else:
                 self.sale_order_id.sudo().write({
                     'order_line': [(0, 0, {
@@ -729,3 +756,9 @@ class ProductionInstructionsTagLine(models.Model):
                     })]
                 })
                 self.so_line_updated = True
+
+    # def unlink(self):
+    #     res = super(ProductionInstructionsTagLine, self).unlink()
+    #     if self.instruction_ref_line_id.send_for_production:
+    #         raise UserError(_("Unable to delete since Production is generated for the line"))
+    #     return res

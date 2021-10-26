@@ -131,7 +131,7 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem id="menu_work_order_pr" name="Production Runs" action="action_production_run_view"
-                  sequence="28" parent="menu_production_processing_instructions"/>
+        <menuitem id="menu_work_order_prun" name="Production Runs" action="action_production_run_view"
+                  sequence="21" parent="menu_production_processing_instructions_topmenu"/>
     </data>
 </odoo>

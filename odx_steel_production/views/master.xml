@@ -54,12 +54,19 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+<!--        <menuitem-->
+<!--                id="menu_machine_master"-->
+<!--                name="Machines"-->
+<!--                action="action_machine_master"-->
+<!--                parent="menu_work_order_configuration"-->
+<!--                sequence="20"/>-->
         <menuitem
-                id="menu_machine_master"
-                name="Machines"
+                id="menu_production_scheduler"
+                name="Scheduler"
                 action="action_machine_master"
-                parent="menu_work_order_configuration"
-                sequence="20"/>
+                parent="menu_production_processing_instructions_topmenu"
+                sequence="22"/>
 
+<!-- -->
     </data>
 </odoo>

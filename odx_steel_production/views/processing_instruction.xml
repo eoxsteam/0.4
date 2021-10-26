@@ -45,7 +45,7 @@
                         </div>
                         <group>
                             <group>
-                                <field name="name" readonly='1' string="Serial #"/>
+                                <field name="name" readonly='1' string="WO #"/>
                                 <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="number_of_productions" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="production_id" invisible="1"/>
@@ -79,9 +79,8 @@
                         <notebook>
                             <page string="Production Runs">
                                 <br/>
-                                <field name="run_line_ids" nolabel="1"
-                                       context="{'default_prod_inst_ref_id': active_id}">
-                                    <tree>
+                                <field name="run_line_ids" nolabel="1">
+                                    <tree create="false">
                                         <field name="name" readonly="1"/>
                                         <field name="send_for_production"/>
                                         <field name="operation"/>
@@ -112,7 +111,7 @@
                                             </group>
                                             <div style="margin-left:50%">
                                                 <label for="scrap_percent"/>
-                                                 <field name="scrap_percent"/>
+                                                <field name="scrap_percent"/>
                                                 <span>&#160;</span>
                                                 <button
                                                         help="Scrap weight exceeded the scrap limit"
@@ -120,7 +119,7 @@
                                                         style="margin-left:5px;">
                                                     <i class="fa fa-exclamation-triangle" style="color:red;"/>
                                                 </button>
-                                                 <field name="warning_message" invisible="1"/>
+                                                <field name="warning_message" invisible="1"/>
                                             </div>
                                             <br/>
 
@@ -131,7 +130,8 @@
                                                            string="Tag #"/>
                                                     <field name="category_id" readonly="1" optional="hide"
                                                            force_save="1"/>
-                                                    <field name="sub_category_id" readonly="1" force_save="1"/>
+                                                    <field name="sub_category_id" readonly="1" force_save="1"
+                                                           optional="hide"/>
                                                     <field name="product_id" readonly="1" force_save="1"/>
                                                     <field name="thickness_in" readonly="1" force_save="1"/>
                                                     <field name="width_in" readonly="1" force_save="1"/>
@@ -169,13 +169,13 @@
                                                     </group>
                                                     <br/>
                                                     <field name="tag_line_ids" nolabel="1">
-                                                        <tree editable="bottom">
+                                                        <tree editable="bottom" create="false">
                                                             <field name="lot_id" readonly="1" string="Parent Coil"/>
 
                                                             <field name="finished_lot_id" readonly="1"
                                                                    string="Lot #"/>
                                                             <field name="category_id" readonly="1" optional="hide"/>
-                                                            <field name="sub_category_id" readonly="1"/>
+                                                            <field name="sub_category_id" readonly="1" optional="hide"/>
                                                             <field name="product_id" readonly="1"/>
                                                             <field name="thickness_in" readonly="1"/>
                                                             <field name="width_in"
@@ -195,10 +195,12 @@
                                                             <field name="instruction_ref_line_id" invisible="1"/>
                                                             <field name="is_scrap" optional="hide"/>
                                                             <field name="so_line_updated" invisible="1"/>
-                                                            <field name="sale_order_id" options="{'no_create_edit': True}"
+                                                            <field name="sale_order_id"
+                                                                   options="{'no_create_edit': True}"
                                                                    attrs="{'readonly':['|',('is_scrap','!=', False),('action', '!=', 'finished_goods')]}"/>
                                                             <!--                                                             attrs="{'readonly':[('is_scrap','!=', False)],'column_invisible': [('action', '!=', 'finished_goods')]}"-->
-                                                            <field name="order_line_id" options="{'no_create_edit': True, 'no_open': True}"
+                                                            <field name="order_line_id"
+                                                                   options="{'no_create_edit': True, 'no_open': True}"
                                                                    attrs="{'readonly':['|',('is_scrap','!=', False),('action', '!=', 'finished_goods')]}"/>
                                                             <button name="add_to_sale_order" string="Add to SO"
                                                                     type="object"
@@ -235,7 +237,7 @@
             <field name="name">Work Orders</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">production.instructions</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">kanban,tree,form</field>
         </record>
 
         <menuitem id="menu_work_order" name="Work Order" action="action_processing_instructions"
@@ -244,15 +246,22 @@
         <!--        <field name="groups_id" eval="[(6,0, [ref('odx_steel_production.group_production_view_access')])]"/>/>-->
 
         <menuitem
-                id="menu_production_processing_instructions"
+                id="menu_production_processing_instructions_topmenu"
                 name="Work Orders"
-                action="action_processing_instructions" parent="menu_work_order"
+                parent="menu_work_order"
                 sequence="20"/>
         <menuitem
-                id="menu_work_order_configuration"
-                name="Configuration"
-                action="action_processing_instructions" parent="menu_work_order"
-                sequence="22"/>
+                id="menu_production_processing_instructions_submenu"
+                name="Work Orders"
+                action="action_processing_instructions"
+                parent="menu_production_processing_instructions_topmenu"
+                sequence="20"/>
+
+<!--        <menuitem-->
+<!--                id="menu_work_order_configuration"-->
+<!--                name="Configuration"-->
+<!--                action="action_processing_instructions" parent="menu_work_order"-->
+<!--                sequence="22"/>-->
 
         <!--        <menuitem id="menu_work_orders" name="Work Orders" parent="menu_steel_production"  action="action_steel_production"-->
         <!--                  sequence="28" web_icon="odx_steel_production,static/description/production.png"/>-->
