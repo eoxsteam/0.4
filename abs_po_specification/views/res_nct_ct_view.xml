@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_nct_ct_form_view" model="ir.ui.view">
+        <field name="name">res.nct.ct.form</field>
+        <field name="model">res.nct.ct</field>
+        <field name="arch" type="xml">
+            <form string="NCT/CT">
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>  
+                    </group>
+                </sheet>
+            </form>     
+        </field>
+    </record>
+    <record id="res_nct_ct_tree_view" model="ir.ui.view">
+        <field name="name">res.nct.ct.tree</field>
+        <field name="model">res.nct.ct</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_nct_ct_views" model="ir.actions.act_window">
+        <field name="name">NCT/CT</field>
+        <field name="res_model">res.nct.ct</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="res_nct_ct_tree_view"/>
+    </record>   
+    
+    <menuitem
+            id="menu_action_nct_ct_views"
+            name="NCT/CT"
+            sequence="99"
+            parent="abs_crane.menu_specification"
+            action="action_nct_ct_views"/>
+</odoo>

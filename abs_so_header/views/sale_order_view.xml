@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_sale_order_form_view_header" model="ir.ui.view">
+        <field name="name">sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_order_template_id']" position="after">
+                <field name="credit_limit"/>
+                <field name="order_type"/>
+                <field name="customer_po_number"/>
+                <label for="res_receiving_hours_id"/>
+                <div class="o_row">
+                    <field name="res_receiving_hours_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                    <field name="res_receiving_day_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='validity_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='hold_delivery_till_payment']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_method_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> 
+            <xpath expr="//field[@name='warehouse_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="validity_date" string="Quote Expiration"/>
+                <field name="order_due_date"/>
+                <field name="pricelist_id"/>
+                <field name="payment_term_id"/>
+                <field name="payment_method_id"/>
+                <field name="hold_delivery_till_payment"/>
+                <field name="hot"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="inherit_sale_order_form_view_inherited_optional" model="ir.ui.view">
+        <field name="name">sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="odx_product_custom_steel.sale_order_form_view_inherited_optional"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='optional_products']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

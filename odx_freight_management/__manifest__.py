@@ -7,7 +7,7 @@
     'summary': '',
     'author': 'Odox',
     'website': 'https://www.odoxsofthub.com',
-    'version': '13.0.0.0.0',
+    'version': '13.0.0.0.2',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'stock', 'mail', 'purchase','account','sale','odx_steel_production','odx_product_custom_steel'],
@@ -24,6 +24,7 @@
         'views/frm_view.xml',
         'views/masters_view.xml',
         'views/stock_picking_view.xml',
+        'views/mail_menu_view.xml',
 
     ],
     # only loaded in demonstration mode

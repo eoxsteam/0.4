@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_eye_pos_form_view" model="ir.ui.view">
+        <field name="name">res.eye.pos.form</field>
+        <field name="model">res.eye.pos</field>
+        <field name="arch" type="xml">
+            <form string="eye_pos">
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>  
+                    </group>
+                </sheet>
+            </form>     
+        </field>
+    </record>
+    <record id="res_eye_pos_tree_view" model="ir.ui.view">
+        <field name="name">res.eye.pos.tree</field>
+        <field name="model">res.eye.pos</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_eye_pos_views" model="ir.actions.act_window">
+        <field name="name">Eye Pos</field>
+        <field name="res_model">res.eye.pos</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="res_eye_pos_tree_view"/>
+    </record>   
+    
+    <menuitem
+            id="menu_action_eye_pos_views"
+            name="Eye Pos"
+            sequence="99"
+            parent="abs_crane.menu_specification"
+            action="action_eye_pos_views"/>
+</odoo>

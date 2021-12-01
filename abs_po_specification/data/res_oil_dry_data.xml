@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+        <record id="res_oil_dry_data_1" model="res.oil.dry">
+            <field name="name">Oil</field>
+        </record>
+        <record id="res_oil_dry_data_2" model="res.oil.dry">
+            <field name="name">Dry</field>
+        </record>
+    </data>
+
+</odoo>

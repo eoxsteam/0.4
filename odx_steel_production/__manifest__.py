@@ -7,7 +7,7 @@
     'summary': '',
     'author': 'Odox',
     'website': 'https://www.odoxsofthub.com',
-    'version': '13.0.0.0.0',
+    'version': '13.0.0.0.6',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'sale', 'stock', 'mail','account','odx_report_customisation'],
@@ -22,6 +22,7 @@
         'views/job_order.xml',
         'views/back_end.xml',
         'views/processing_instruction.xml',
+        'wizard/production_run_block_view.xml',
         'views/master.xml',
         'views/production_run.xml',
         # 'views/stock_valuation.xml',

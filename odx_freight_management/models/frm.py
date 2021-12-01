@@ -11,6 +11,16 @@ class FreightManagement(models.Model):
     _order = 'id desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    @api.model
+    def default_get(self, fields):
+        res = super(FreightManagement, self).default_get(fields)
+        ctx = dict(self.env.context)
+        if 'check_receive_bool' in fields and ctx.get("check_receive_bool"):
+            res['check_receive_bool'] = ctx['check_receive_bool']
+        if 'check_dispatch_bool' in fields and ctx.get("check_dispatch_bool"):
+            res['check_dispatch_bool'] = ctx['check_dispatch_bool']
+        return res
+
     name = fields.Char(
         'Reference', default=lambda self: self.env['ir.sequence'].next_by_code('custom.freight.sequence') or _('New'),
         required=True, readonly=True, help="Reference", copy=False)
@@ -23,7 +33,7 @@ class FreightManagement(models.Model):
     company_currency = fields.Many2one(string='Currency', related='company_id.currency_id', readonly=True,
                                        relation="res.currency")
     purchase_order_id = fields.Many2one('purchase.order', string='Purchase Reference')
-    sale_order_id = fields.Many2one('sale.order', string='Sale Reference')
+    sale_order_id = fields.Many2one('sale.order', string='Sale Order Reference')
     job_order_id = fields.Many2one('job.order', string='Job order Reference')
 
     stock_picking_id = fields.Many2one('stock.picking', string='Picking Reference')
@@ -34,6 +44,8 @@ class FreightManagement(models.Model):
     comments = fields.Char(string='Comments', track_visibility="onchange")
     cargo_lines = fields.One2many('cargo.line', 'freight_id', string="Cargo Lines")
     invoice_count = fields.Integer(string="Invoice Count", compute="_compute_invoice")
+    check_receive_bool = fields.Boolean(string="Check  Receive Bool")
+    check_dispatch_bool = fields.Boolean(string="Check  Dispatch Bool")
 
     @api.depends('frm_line_ids.invoice_id')
     def _compute_invoice(self):
@@ -97,6 +109,23 @@ class FreightManagement(models.Model):
             'type': 'ir.actions.act_window',
         }
 
+    # def action_view_sale(self):
+    #     orders_list = []
+    #     if self.sale_order_id:
+    #         sale_orders = self.env['sale.order'].search([('id', '=', self.sale_order_id.id)])
+    #         orders_list.append(sale_orders.id)
+    #
+    #     return {
+    #         'name': 'Sales Order',
+    #         'view_type': 'form',
+    #         'view_mode': 'tree,form',
+    #         'res_model': 'sale.order',
+    #         'view_id': False,
+    #         'target': 'current',
+    #         'domain': [('id', '=', orders_list)],
+    #         'type': 'ir.actions.act_window',
+    #     }
+
     def action_view_invoice(self):
         orders_list = []
         invoice_ids = self.env['account.move'].search([('freight_id', '=', self.id)])
@@ -148,15 +177,15 @@ class FreightLine(models.Model):
     name = fields.Char(string="Tracking No",
                        default=lambda self: self.env['ir.sequence'].next_by_code('freight.line') or _('New'),
                        copy=False)
-    source_location = fields.Many2one('frm.location', string="Src Location")
+    source_location = fields.Many2one('frm.location', string="From")
     transporter_id = fields.Many2one('res.partner', string='Transporter', domain="[('transporter', '=', True)]")
     vehicle_ids = fields.Many2many('frm.vehicle', string='Vehicle')
     mode_id = fields.Many2one('frm.mode.operation', string='Transport Mode')
     transported_lot_ids = fields.Many2many('stock.production.lot', string='Lots',
-                                           domain=[('stock_status', 'in', ['available', 'transit','in_production'])])
+                                           domain=[('stock_status', 'in', ['available', 'transit', 'in_production'])])
     # domain=lambda self: self._get_lot_list())
     freight_id = fields.Many2one('freight.management', string="Freight Id")
-    dest_location = fields.Many2one('frm.location', string="Dest. Location")
+    dest_location = fields.Many2one('frm.location', string="To")
     expected_date = fields.Date(string='Exp Date')
     arrived_date = fields.Date(string='Arrived Date')
     total_weight = fields.Float(string='Weight(lbs)')

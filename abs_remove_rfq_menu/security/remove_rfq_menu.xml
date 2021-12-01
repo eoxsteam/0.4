@@ -1,0 +1,6 @@
+<?xml version='1.0'?>
+<odoo>
+    <record model='res.groups' id='show_extra_rfq_menu'>
+        <field name='name'>Can see extra RFQ menu?</field>
+    </record>
+</odoo>

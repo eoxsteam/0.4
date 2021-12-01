@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_sale_order_form_view_inventory_look_up" model="ir.ui.view">
+        <field name="name">sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='order_lines']" position="after">
+                <page string="Inventory Look Up" name="inventory_look_up">
+                    <group>
+                        <button name="button_inventory_lookup_by_item" type="object" string="By Item Info" class="btn-primary" />
+                        <button name="button_inventory_lookup_by_chemistries" type="object" string="By Chemistries" class="btn-primary"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

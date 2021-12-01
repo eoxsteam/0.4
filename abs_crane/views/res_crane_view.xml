@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_crane_view_form_view" model="ir.ui.view">
+        <field name="name">res.crane.form</field>
+        <field name="model">res.crane</field>
+        <field name="arch" type="xml">
+            <form string="crane Type">
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>  
+                    </group>
+                </sheet>
+            </form>     
+        </field>
+    </record>
+    <record id="res_crane_view_tree_view" model="ir.ui.view">
+        <field name="name">res.crane.tree</field>
+        <field name="model">res.crane</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_crane_views" model="ir.actions.act_window">
+        <field name="name">Crane</field>
+        <field name="res_model">res.crane</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="res_crane_view_tree_view"/>
+    </record>   
+
+    <menuitem
+            id="menu_specification"
+            name="Specification"
+            sequence="99"
+            parent="purchase.menu_purchase_config"/>
+
+    <menuitem
+            id="menu_action_crane_views"
+            name="Crane"
+            sequence="99"
+            parent="menu_specification"
+            action="action_crane_views"/>
+</odoo>
+

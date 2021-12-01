@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_terms_condition_tree" model="ir.ui.view">
+        <field name="name">res.terms.condition.tree</field>
+        <field name="model">res.terms.condition</field>
+        <field name="arch" type="xml">
+            <tree string="Terms and Condition">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_res_terms_condition_form" model="ir.ui.view">
+        <field name="name">res.terms.condition.form</field>
+        <field name="model">res.terms.condition</field>
+        <field name="arch" type="xml">
+            <form string="Terms and Condition">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                        </group>
+                        <field name="terms_condition"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_res_terms_condition" model="ir.actions.act_window">
+        <field name="name">Terms and Condition</field>
+        <field name="res_model">res.terms.condition</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_res_terms_condition_tree"/>
+    </record>
+
+    <menuitem id="sub_menu_terms_condition"
+              parent="purchase.menu_purchase_config"
+              name="Terms and Condition"
+              action="action_res_terms_condition"/>
+</odoo>

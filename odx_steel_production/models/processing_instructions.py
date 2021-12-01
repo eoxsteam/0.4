@@ -1,6 +1,5 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
 from odoo.tools import float_round
 
 
@@ -30,6 +29,24 @@ class ProductionInstructions(models.Model):
     production_count = fields.Integer(string="Count", compute="_compute_production_count")
     scrap_percent = fields.Float(string="Scrap %", compute='total_scrap_percent')
     warning_message = fields.Char(string='Warning', readonly=True, compute='show_warning_message')
+    # total_production_run = fields.Integer(compute='total_production_run', string="Total Production Run")
+    #
+    # def total_production_run(self):
+    #     for rec in self:
+    #         rec.total_production_run = len(rec.run_line_ids)
+
+    def action_production_run(self):
+        self.ensure_one()
+        ctx = self._context.copy()
+        ctx.update({
+            'default_prod_inst_ref_id': self.id,
+            'create': True,
+        })
+        action = self.env.ref('odx_steel_production.action_production_run_view').read([])[0]
+        if action:
+            action['context'] = ctx
+            action['domain'] = [('prod_inst_ref_id', '=', self.id)]
+            return action
 
     def total_scrap_percent(self):
         for rec in self:
@@ -62,10 +79,37 @@ class ProductionInstructions(models.Model):
 
     def confirm_prd(self):
         if self.run_line_ids:
+            prepare_scheduler_line = []
+            check_machine = []
             for rec in self.run_line_ids:
+                set_ready_state = False
                 if not rec.send_for_production:
                     raise UserError(_("Please create production for %s" % rec.name))
+                if rec.machine_id.id not in check_machine:
+                    check_machine.append(rec.machine_id.id)
+                    set_ready_state = True
+
+                if set_ready_state:
+                    state = 'ready'
+                else:
+                    state = 'pending'
+
+                next_pr_run_id = self.env['instructions.run.line'].search([
+                    ('id', '>', rec.id),
+                    ('prod_inst_ref_id', '=', self.id)], limit=1)
+
+                prepare_scheduler_line.append({
+                    'machine_id': rec.machine_id.id,
+                    'work_order_id': self.id,
+                    'pr_run_id': rec.id,
+                    'due_date': self.due_date,
+                    'state': state,
+                    'next_pr_run_id': next_pr_run_id.id or False,
+                })
             self.state = 'done'
+            machine_schedular_obj = self.env['machine.scheduler']
+            for line in prepare_scheduler_line:
+                machine_schedular_obj.create(line)
 
     def _compute_production_count(self):
         lines = []
@@ -100,10 +144,38 @@ class ProductionInstructions(models.Model):
                 rec.warning_message = False
 
 
+class SkidManagement(models.Model):
+    _name = 'skid.management'
+    _description = 'Skid Management'
+
+    index = fields.Integer('Sr. No.')
+    package_id = fields.Many2one('stock.quant.package', 'Skid No.')
+    lot_ids = fields.Many2many('stock.production.lot', string='Tag Numbers',
+                               domain="[('stock_status', '!=', 'not_available')]")
+    skid_weight = fields.Float('Skid Weight', compute='compute_skid_weight')
+    sale_order_id = fields.Many2one('sale.order', string='Sale Order', copy=False,
+                                    domain="[('state', '=', 'draft')]")
+    order_line_id = fields.Many2one('sale.order.line', string='Order Line', copy=False,
+                                    domain="[('order_id', '=', sale_order_id) or [] ]")
+    instruction_line_id = fields.Many2one('instructions.run.line', string='Instruction Line Ref')
+
+    @api.depends('lot_ids')
+    def compute_skid_weight(self):
+        for rec in self:
+            rec.skid_weight = sum(rec.lot_ids.mapped('product_qty'))
+
 class InstructionsRunLine(models.Model):
     _name = 'instructions.run.line'
     _description = 'Instructions Line'
     _order = "id asc"
+
+    # @api.model
+    # def default_get(self, fields):
+    #     rec = super(InstructionsRunLine, self).default_get(fields)
+    #     if not self.env.context.get('default_prod_inst_ref_id'):
+    #         raise UserError(_("Please Save the Work Order details!"))
+    #     rec['prod_inst_ref_id'] = self.env.context.get('default_prod_inst_ref_id')
+    #     return rec
 
     @api.model
     def create(self, vals):
@@ -111,7 +183,7 @@ class InstructionsRunLine(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code('production.run.sequence') or _('New')
         return super(InstructionsRunLine, self).create(vals)
 
-    name = fields.Char(string='PR #')
+    name = fields.Char(string='PR No.')
     instruction_run_line_ids = fields.One2many('production.instructions.tag', 'instruction_line_id',
                                                string="Instruction Line")
     tag_line_ids = fields.One2many('production.instructions.tag.line', 'instruction_ref_line_id',
@@ -131,6 +203,42 @@ class InstructionsRunLine(models.Model):
     total_scrap_wt = fields.Float(string='Scrap Weight', compute='calculate_scrap_weight')
     pr_instructions = fields.Html(string='Instructions')
     warning_message = fields.Char(string='Warning', readonly=True, compute='show_warning_message')
+    finish_picking_id = fields.Many2one('stock.picking', 'Finish Picking')
+    skid_line_ids = fields.One2many('skid.management', 'instruction_line_id')
+    skid_completed = fields.Boolean('Skid Done?')
+
+    def action_skid_management(self):
+        index = 1
+        self.skid_completed = True
+        for rec in self.skid_line_ids:
+            if not rec.package_id:
+                package_name = self.env['ir.sequence'].next_by_code('stock.quant.package1')
+                package_id = self.env['stock.quant.package'].create({'name': package_name})
+                rec.package_id = package_id.id
+            else:
+                package_id = rec.package_id
+            if not package_id.quant_ids:
+                for lot_id in rec.lot_ids:
+                    self.env['stock.quant'].sudo().create({
+                        'product_id': lot_id.product_id.id,
+                        'lot_id': lot_id.id,
+                        'location_id': lot_id.loc_city.id,
+                        'quantity': lot_id.product_qty,
+                        'package_id': package_id.id
+                    })
+            else:
+                for lot_id in rec.lot_ids:
+                    package_quant_ids = package_id.mapped('quant_ids').mapped('lot_id')
+                    if lot_id.id not in package_quant_ids.ids:
+                        self.env['stock.quant'].sudo().create({
+                            'product_id': lot_id.product_id.id,
+                            'lot_id': lot_id.id,
+                            'location_id': lot_id.loc_city.id,
+                            'quantity': lot_id.product_qty,
+                            'package_id': package_id.id
+                        })
+            rec.index = index
+            index += 1
 
     def show_warning_message(self):
         for rec in self:
@@ -141,6 +249,7 @@ class InstructionsRunLine(models.Model):
                 rec.warning_message = False
 
     def add_scrap_line(self):
+        index = len(self.tag_line_ids) + 1
         if self.operation == 'cutting':
             for tags in self.instruction_run_line_ids:
                 balance_wt = balance_width = 0
@@ -156,6 +265,7 @@ class InstructionsRunLine(models.Model):
                 if line_weight < tags.product_qty:
                     self.write({
                         'tag_line_ids': [(0, 0, {
+                            'index': index,
                             'lot_id': tags.lot_id.id,
                             'product_id': tags.product_id.id,
                             'category_id': tags.category_id.id,
@@ -185,6 +295,7 @@ class InstructionsRunLine(models.Model):
                 if line_weight < tags.product_qty:
                     self.write({
                         'tag_line_ids': [(0, 0, {
+                            'index': index,
                             'lot_id': tags.lot_id.id,
                             'product_id': tags.product_id.id,
                             'category_id': tags.category_id.id,
@@ -215,6 +326,7 @@ class InstructionsRunLine(models.Model):
                 if line_weight < tags.product_qty:
                     self.write({
                         'tag_line_ids': [(0, 0, {
+                            'index': index,
                             'lot_id': tags.lot_id.id,
                             'product_id': tags.product_id.id,
                             'category_id': tags.category_id.id,
@@ -253,6 +365,106 @@ class InstructionsRunLine(models.Model):
                     scrap_wt += line.product_qty
             if scrap_wt:
                 rec.total_scrap_wt = scrap_wt
+
+    def update_instruction_run_line(self):
+        self.save_form()
+        self.tag_line_ids.unlink()
+        for instruction_run_line_id in self.instruction_run_line_ids:
+            # instruction_run_line_id.update_lines()
+            if self.operation == 'slitting':
+                total_product_qty = 0.0
+                count = 1
+                for setup_instructions_line_id in instruction_run_line_id.setup_instruction_id.setup_instructions_line_ids:
+                    i = 1
+                    while i <= setup_instructions_line_id.no_of:
+                        product_qty = setup_instructions_line_id.width / instruction_run_line_id.width_in * instruction_run_line_id.product_qty
+                        total_product_qty += product_qty
+                        self.write({
+                            'tag_line_ids': [(0, 0, {
+                                'index': count,
+                                'lot_id': instruction_run_line_id.lot_id.id,
+                                'category_id': instruction_run_line_id.lot_id.category_id.id,
+                                'sub_category_id': instruction_run_line_id.lot_id.sub_category_id.id,
+                                'product_id': instruction_run_line_id.lot_id.product_id.id,
+                                'product_uom_id': instruction_run_line_id.lot_id.product_uom_id.id,
+                                'thickness_in': instruction_run_line_id.lot_id.thickness_in,
+                                'width_in': setup_instructions_line_id.width,
+                                'product_qty': int(product_qty),
+                                'material_type': 'coil',
+                                'no_of_pieces': 1, #setup_instructions_line_id.no_of,
+                            })]
+                        })
+                        i += 1
+                        count += 1
+                if total_product_qty > instruction_run_line_id.product_qty:
+                    raise UserError(_("Total Weight (%s) is exceed for %s Product, defined weight is (%s)!") % (
+                        round(total_product_qty, 2),
+                        instruction_run_line_id.product_id.display_name,
+                        round(instruction_run_line_id.product_qty, 2)))
+            elif self.operation == 'cutting':
+                total_product_qty = 0.0
+                i = 1
+                for setup_instructions_line_id in instruction_run_line_id.setup_instruction_id.setup_instructions_line_1_ids:
+                    unit_sheet_weight = instruction_run_line_id.lot_id.thickness_in * instruction_run_line_id.width_in * setup_instructions_line_id.width * 0.284
+                    product_qty = int(unit_sheet_weight * setup_instructions_line_id.no_of)
+                    total_product_qty += product_qty
+                    self.write({
+                        'tag_line_ids': [(0, 0, {
+                            'index': i,
+                            'lot_id': instruction_run_line_id.lot_id.id,
+                            'category_id': instruction_run_line_id.lot_id.category_id.id,
+                            'sub_category_id': instruction_run_line_id.lot_id.sub_category_id.id,
+                            'product_id': instruction_run_line_id.lot_id.product_id.id,
+                            'product_uom_id': instruction_run_line_id.lot_id.product_uom_id.id,
+                            'thickness_in': instruction_run_line_id.lot_id.thickness_in,
+                            'width_in': instruction_run_line_id.width_in,
+                            'length_in': setup_instructions_line_id.width,
+                            'product_qty': int(product_qty),
+                            'material_type': 'sheets',
+                            'no_of_pieces': setup_instructions_line_id.no_of,
+                            'number_of_sheets': setup_instructions_line_id.no_of,
+                        })]
+                    })
+                    i += 1
+                if total_product_qty > instruction_run_line_id.product_qty:
+                    raise UserError(_("Total Weight (%s) is exceed for %s Product, defined weight is (%s)!") % (
+                        round(total_product_qty, 2),
+                        instruction_run_line_id.product_id.display_name,
+                        round(instruction_run_line_id.product_qty, 2)))
+
+            elif self.operation == 'parting':
+                total_product_qty = 0.0
+                count = 1
+                for setup_instructions_line_id in instruction_run_line_id.setup_instruction_id.setup_instructions_line_2_ids:
+                    i = 1
+                    while i <= setup_instructions_line_id.no_of:
+                        # product_qty = setup_instructions_line_id.no_of * setup_instructions_line_id.width
+                        product_qty = setup_instructions_line_id.width
+                        total_product_qty += product_qty
+                        self.write({
+                            'tag_line_ids': [(0, 0, {
+                                'index': count,
+                                'lot_id': instruction_run_line_id.lot_id.id,
+                                'category_id': instruction_run_line_id.lot_id.category_id.id,
+                                'sub_category_id': instruction_run_line_id.lot_id.sub_category_id.id,
+                                'product_id': instruction_run_line_id.lot_id.product_id.id,
+                                'product_uom_id': instruction_run_line_id.lot_id.product_uom_id.id,
+                                'thickness_in': instruction_run_line_id.lot_id.thickness_in,
+                                'width_in': setup_instructions_line_id.width,
+                                'product_qty': int(product_qty),
+                                'material_type': 'coil',
+                                'no_of_pieces': 1,
+                                # 'no_of_pieces': setup_instructions_line_id.no_of,
+                            })]
+                        })
+                        i += 1
+                        count += 1
+                if total_product_qty > instruction_run_line_id.product_qty:
+                    raise UserError(_("Total Weight (%s) is exceed for %s Product, defined weight is (%s)!") % (
+                        round(total_product_qty, 2),
+                        instruction_run_line_id.product_id.display_name,
+                        round(instruction_run_line_id.product_qty, 2)))
+
 
     def save_form(self):
         # self.write(vals)
@@ -395,6 +607,7 @@ class InstructionsRunLine(models.Model):
             [('code', '=', 'internal'), ('company_id', '=', self.env.company.id),
              ('warehouse_id', '=', warehouse.id)])
 
+        self.add_scrap_line()
         for lots in self.instruction_run_line_ids:
             picking_type = self.env['stock.picking.type'].search(
                 [('code', '=', 'internal'), ('company_id', '=', self.env.company.id),
@@ -424,8 +637,10 @@ class InstructionsRunLine(models.Model):
                 line.qty_done = lots.product_qty
             picking_source_id.button_validate()
 
-            lots.lot_id.stock_status = 'not_available'
-            lots.lot_status = 'not_available'
+            lots.lot_id.stock_status = 'in_production'
+            lots.lot_status = 'in_production'
+            # lots.lot_id.stock_status = 'not_available'
+            # lots.lot_status = 'not_available'
             lots.lot_id.process_done = self.operation
             # if self.operation == 'annealing':
             #     lots.lot_id.is_annealed = 'yes'
@@ -465,6 +680,8 @@ class InstructionsRunLine(models.Model):
                 qty = float_round(products.product_qty, precision_rounding=rounding)
 
                 status_stock = 'available'
+                if products.action == "reslit":
+                    status_stock = 're_run'
 
                 new_lots = self.env['stock.production.lot'].with_context({'baby_lot': True}). \
                     create(
@@ -539,16 +756,24 @@ class InstructionsRunLine(models.Model):
                 new_lots._onchange_length()
                 lot_ids.append(new_lots)
                 products.finished_lot_id = new_lots.id
+                products_sacp = ''
                 if products.action == "restock":
+                    products_sacp = 'restock'
                     line_status = 'available'
                 elif products.action == "reslit":
                     line_status = 'in_production'
+                    products_sacp = 're_run'
                 elif products.action == "finished_goods":
                     line_status = 'finished_good'
+                    products_sacp = 'reserved'
                 else:
                     line_status = 'available'
 
-                products.lot_status = line_status
+                vals = {'lot_status': line_status, 'sacp': products_sacp}
+                if not products.action:
+                    vals.update({'action': 'restock'})
+
+                products.write(vals)
                 move_line_id = self.env['stock.move.line'].create(
                     move._prepare_move_line_vals())
 
@@ -557,13 +782,67 @@ class InstructionsRunLine(models.Model):
                     line.qty_done = qty
                     new_move_list = line.id
 
-            try:
-                finished_picking.action_confirm()
-            except:
-                pass
-            finished_picking.with_context({'baby_lot': True}).button_validate()
+            # try:
+            #     finished_picking.action_confirm()
+            # except:
+            #     pass
+            # finished_picking.with_context({'baby_lot': True}).button_validate()
+            self.finish_picking_id = finished_picking.id
             self.send_for_production = True
             # self.write({'state': 'done'})
+            # return {'type': 'ir.actions.client', 'tag': 'reload'}
+
+
+class SetupInstruction(models.Model):
+    _name = 'setup.instructions'
+    _description = 'Setup Instructions'
+    _rec_name = 'lot_id'
+
+    def get_formview_id(self, access_uid=None):
+        self.operation = self.env.context.get('default_operation')
+        return False
+
+    lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Lot")
+    product_id = fields.Many2one('product.product', string='Product')
+    product_inst_tag_id = fields.Many2one('production.instructions.tag', string='Inst Tag')
+    setup_instructions_line_ids = fields.One2many('setup.instructions.line', 'setup_instruction_id')
+    setup_instructions_line_1_ids = fields.One2many('setup.instructions.line1', 'setup_instruction_id')
+    setup_instructions_line_2_ids = fields.One2many('setup.instructions.line2', 'setup_instruction_id')
+    operation = fields.Selection([
+        ('slitting', 'Slitting'),
+        ('cutting', 'Cut to Length'),
+        ('parting', 'Re-Winding'),
+    ], string='Operation', required=True, default='slitting')
+
+
+class SetupInstructionLine(models.Model):
+    _name = 'setup.instructions.line'
+    _description = 'Setup Instructions Line'
+
+    setup_instruction_id = fields.Many2one('setup.instructions', 'Setup Instruction')
+    operation = fields.Selection(related='setup_instruction_id.operation')
+    no_of = fields.Integer('No. Of Cuts', required=True)
+    width = fields.Float('Width', required=True)
+
+
+class SetupInstructionLine1(models.Model):
+    _name = 'setup.instructions.line1'
+    _description = 'Setup Instructions Line1'
+
+    setup_instruction_id = fields.Many2one('setup.instructions', 'Setup Instruction')
+    operation = fields.Selection(related='setup_instruction_id.operation')
+    no_of = fields.Integer('No. Of Sheets', required=True)
+    width = fields.Float('Length', required=True)
+
+
+class SetupInstructionLine2(models.Model):
+    _name = 'setup.instructions.line2'
+    _description = 'Setup Instructions Line2'
+
+    setup_instruction_id = fields.Many2one('setup.instructions', 'Setup Instruction')
+    operation = fields.Selection(related='setup_instruction_id.operation')
+    no_of = fields.Integer('No. Of Parts', required=True)
+    width = fields.Float('Weight', required=True)
 
 
 class ProductionInstructionsTag(models.Model):
@@ -571,7 +850,7 @@ class ProductionInstructionsTag(models.Model):
     _description = 'Production Instructions Tag'
 
     lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Lot",
-                             domain=[('material_type', '=', 'coil'), ('stock_status', '=', 'available'), ])
+                             domain=[('material_type', '=', 'coil'), ('stock_status', 'in', ['available', 'reserved', 're_run'])])
     category_id = fields.Many2one('product.category', string="Master", domain="[('parent_id', '=', False)]")
     sub_category_id = fields.Many2one('product.category', string="Sub Category")
     product_id = fields.Many2one('product.product', string='Product')
@@ -589,16 +868,21 @@ class ProductionInstructionsTag(models.Model):
         ('transit', 'In Transit'),
         ('available', 'Available'),
         ('reserved', 'Reserved'),
+        ('re_run', 'To Re-Run'),
         ('in_production', 'In production'),
         ('not_available', 'Not available')
     ], string='Stock Status')
+    setup_instruction_id = fields.Many2one('setup.instructions', 'Setup')
 
     @api.onchange('lot_id')
     def onchange_lot_id(self):
         self.category_id = self.lot_id.category_id.id if self.lot_id.category_id else False
         self.sub_category_id = self.lot_id.sub_category_id.id if self.lot_id.sub_category_id else False
         self.product_id = self.lot_id.product_id.id if self.lot_id.product_id else False
-        self.product_qty = self.lot_id.product_qty
+        qty = self.lot_id.product_qty / self.lot_id.no_of_pieces if self.lot_id.no_of_pieces else self.lot_id.product_qty
+        if self.lot_id.stock_status == 're_run':
+            qty = self.lot_id.product_qty
+        self.product_qty = qty
         self.width_in = self.lot_id.width_in
         self.thickness_in = self.lot_id.thickness_in
         self.product_uom_id = self.lot_id.product_uom_id.id if self.lot_id.product_uom_id else False
@@ -665,6 +949,7 @@ class ProductionInstructionsTagLine(models.Model):
     _name = 'production.instructions.tag.line'
     _description = 'Production Instructions TagLine'
 
+    index = fields.Integer('Sr. No.')
     lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Parent Coil",
                              domain=[('material_type', '=', 'coil'), ('stock_status', '=', 'available'), ])
     finished_lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Lot", )
@@ -703,6 +988,19 @@ class ProductionInstructionsTagLine(models.Model):
         ('finished_good', 'Finished Good'),
         ('not_available', 'Not available')
     ], string='Status')
+    no_of_pieces = fields.Integer('No. Of Pieces')
+    # Status after create production
+    sacp = fields.Selection([
+        ('restock', 'In Production'),
+        ('reserved', 'Reserved'),
+        ('re_run', 'To Re-Run'),
+    ], string='SACP')
+    # Status after run completed
+    sarc = fields.Selection([
+        ('available', 'Available'),
+        ('reserved', 'Reserved'),
+        ('re_run', 'To Re-Run'),
+    ], string='SARC')
 
     @api.onchange('width_in')
     def _onchange_width_in(self):
@@ -762,3 +1060,20 @@ class ProductionInstructionsTagLine(models.Model):
     #     if self.instruction_ref_line_id.send_for_production:
     #         raise UserError(_("Unable to delete since Production is generated for the line"))
     #     return res
+
+class ProductionLot(models.Model):
+    _inherit = 'stock.production.lot'
+
+    def _product_qty(self):
+        for lot in self:
+            if lot.stock_status == 're_run':
+                pitl_ids = self.env['production.instructions.tag.line'].search([('finished_lot_id', '=', lot.id), ('action', '=', 'reslit')])
+                lot.product_qty = sum(pitl_ids.mapped('product_qty'))
+            else:
+                super(ProductionLot, self)._product_qty()
+
+
+class StockQuantPackage(models.Model):
+    _inherit = 'stock.quant.package'
+
+    name = fields.Char(default=lambda self: self.env['ir.sequence'].next_by_code('stock.quant.package1') or _('Unknown Pack'))

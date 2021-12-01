@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="inherit_odx_stock_lot_view_inherit">
+        <field name="name">stock.production.lot.view.inherit</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="odx_product_custom_steel.stock_lot_view_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group[2]/group[2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group[3]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group[3]/group[1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group[4]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group[5]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group[1]/group[2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="after">
+                <group>
+                    <group>
+                        <table>
+                            <tr>
+                                <td>
+                                    <label for="name" class="oe_edit_only"/>
+                                    <h1>
+                                        <field name="name" placeholder="e.g. LOT/0001/20121"/>
+                                    </h1>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="category_id" />
+                                </td>
+                                <td>
+                                    <field name="category_id" attrs="{'readonly': [('state', '=', 'confirm')]}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="sub_category_id"/>
+                                </td>
+                                <td>
+                                    <field name="sub_category_id" attrs="{'readonly': [('state', '=', 'confirm')]}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="product_id"/>
+                                </td>
+                                <td>
+                                    <field name="product_id" attrs="{'readonly': [('state', '=', 'confirm')]}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="no_of_pieces" string="No. of Pieces"/>
+                                </td>
+                                <td>
+                                    <field name="no_of_pieces" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="thickness_mm"/>
+                                </td>
+                                <td>
+                                    <field name="thickness_mm" string="Thickness(MM)"  force_save="1"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="thickness_in" string="Thickness Range(in)"/>
+                                </td>
+                                <td>
+                                    <field name="thickness_in" string="Thickness(IN)"
+                                               t-options='{"widget": "float", "decimal_precision": "Product Unit of Measure"}'
+                                               attrs="{'readonly': [('state', '=', 'confirm')]}"/>
+                                </td>
+                                <td width="1%"><span>to</span></td>
+                                <td colspan="2">
+                                    <field name="thickness_in_ul" string="Thickness(IN)"
+                                               t-options='{"widget": "float", "decimal_precision": "Product Unit of Measure"}'
+                                               attrs="{'readonly': [('state', '=', 'confirm')]}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="gauge_id" string="Gauge"/>
+                                </td>
+                                <td>
+                                    <field name="gauge_id" attrs="{'readonly': [('state', '=', 'confirm')]}" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="res_guage_type" string="Gauge Type"/>
+                                </td>
+                                <td>
+                                    <field name="res_guage_type" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="width_in"/>
+                                </td>
+                                <td>
+                                    <field name="width_in" string="Width(IN)" attrs="{'readonly': [('state', '=', 'confirm')]}"/>
+                                </td>
+                                <td width="5%"></td>
+                                <td>
+                                    <label for="width_mm"/>
+                                </td>
+                                <td>
+                                    <field name="width_mm" string="Width(MM)" readonly="1" force_save="1"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="length_in" />
+                                </td>
+                                <td>
+                                    <field name="length_in" string="Length(IN)" attrs="{'readonly': [('state', '=', 'confirm')]}"/>
+                                </td>
+                                <td width="5%"></td>
+                                <td>
+                                    <label for="length_mm"/>
+                                </td>
+                                <td>
+                                    <field name="length_mm" string="Length(MM)" force_save="1"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="weight_lb" string="Weight(LB)"/>
+                                </td>
+                                <td>
+                                    <field name="weight_lb" string="Weight(LB)" readonly="1"/>
+                                </td>
+                                <td width="12%">
+                                    <field name="product_uom_id"
+                                            widget="selection"
+                                            no_label="1"/>
+                                </td>	
+                                <td>
+                                    <label for="weight_kg"/>
+                                </td>
+                                <td>
+                                    <field name="weight_kg" string="Weight(KG)" />
+                                </td>
+                            </tr>  
+                            <tr>
+                                <td>
+                                    <label for="loc_city" />
+                                </td>
+                                <td>
+                                    <field name="loc_city"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="loc_warehouse" />
+                                </td>
+                                <td>
+                                    <field name="loc_warehouse"/>
+                                </td>
+                            </tr> 
+                        </table>         
+                    </group>
+                    <group>
+                        <table>
+                            <tr>
+                                <td>
+                                    <label for="stock_status"/>
+                                </td>
+                                <td>
+                                    <field name="stock_status" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="piw"/>
+                                </td>
+                                <td>
+                                    <field name="piw" string="PIW" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="id_lot_stock" string="Id"/>
+                                </td>
+                                <td>
+                                    <field name="id_lot_stock" string="ID" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="lot_od"/>
+                                </td>
+                                <td>
+                                    <field name="lot_od" string="OD" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="reserve_customer_id"/>
+                                </td>
+                                <td>
+                                    <field name="reserve_customer_id" string="Reserve Customer" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="customer_po"/>
+                                </td>
+                                <td>
+                                    <field name="customer_po" string="Customer PO" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="sale_ref_ids" string="Sales Order Reference"/>
+                                </td>
+                                <td>
+                                    <field name="sale_ref_ids" string="Customer PO" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="release_no"/>
+                                </td>
+                                <td>
+                                    <field name="release_no" string="Release No." />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="mill_tag_number"/>
+                                </td>
+                                <td>
+                                    <field name="mill_tag_number" string="Mill Tag Number" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="res_grade" string="Grade"/>
+                                </td>
+                                <td>
+                                    <field name="res_grade" string="Grade" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <group>
+                        <table>
+                            <tr>    
+                                <td>
+                                     <field name="image_1920" widget="image" nolabel="1"/>
+                                </td>
+                            </tr>
+                        </table>
+                        </group>
+                    </group>
+                </group> 
+            </xpath>
+
+            <xpath expr="//page[@name='surface_finish']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='quality_remarks']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[3]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='chemical_properties']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='coil_details']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='first_processor']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='receiving_details']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='purchase_details']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[9]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='description']" position="before">
+                <page string="Surface Finish">
+                    <group>
+                        <group>
+                            <field name="res_nct_ct_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                            <field name="res_oil_dry_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                            <field name="finish"/>
+                            <field name="temper"/>
+                            <field name="process_undergone_ids" widget="many2many_tags" options="{'no_quick_create': True, 'no_create_edit' : True}" string="Process Undergone"/>
+                        </group>
+                        <group>
+                            <field name="coating"/>
+                            <field name="coating_weight"/>
+                            <field name="spangle"/>
+                            <field name="surface"/>
+                            <field name="res_edge_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Chemical Properties">
+                    <table>
+                        <tr VALIGN="TOP">
+                            <td colspan='2'> Chemistry </td>
+                            <td> Non - Standard </td>
+                        </tr>
+                        <tr VALIGN="TOP">
+                            <td>
+                                <group>
+                                    <field name="comp_al"/>
+                                    <field name="comp_cu"/>
+                                    <field name="comp_cr"/>
+                                    <field name="comp_fe"/>
+                                    <field name="comp_mg"/>
+                                    <field name="comp_b"/>
+                                    <field name="comp_c"/>
+                                    <field name="comp_n"/>
+                                    <field name="comp_si"/>
+                                    <field name="comp_p"/>
+                                    <field name="comp_s"/>
+                                    <field name="comp_ca"/>
+                                    <field name="comp_ti"/>
+                                    <field name="comp_mn"/>
+                                    <field name="comp_co"/>
+                                    <field name="comp_ni"/>
+                                    <field name="comp_zn"/>
+                                    <field name="comp_nb_cb"/>
+                                </group>
+                            </td>
+                            <td>
+                                <group>
+                                    <field name="comp_mo"/>
+                                    <field name="comp_cd"/>
+                                    <field name="comp_sn"/>
+                                    <field name="comp_w"/>
+                                    <field name="comp_pb"/>
+                                    <field name="comp_bi"/>
+                                    <field name="comp_be"/>
+                                    <field name="comp_as"/>
+                                    <field name="comp_se"/>
+                                    <field name="comp_zr"/>
+                                    <field name="comp_ag"/>
+                                    <field name="comp_sb"/>
+                                    <field name="comp_au"/>
+                                    <field name="comp_o"/>
+                                    <field name="comp_v"/>
+                                    <field name="comp_y"/>
+                                    <field name="comp_h"/>
+                                </group>
+                            </td>
+                            <td>
+                                <group>
+                                    <field name="soluble_aluminium"/>
+                                    <field name="carbon_equivalent"/>
+                                    <field name="residual_hydrogen"/>
+                                    <field name="total_residual"/>
+                                </group>
+                            </td>
+                        </tr>
+                    </table>
+                </page>
+                <page string="Physical Properties">
+                    <group>  
+                        <group>
+                            <field name="yield_mpa"/>
+                            <field name="yield_psi"/>
+                            <field name="yield_ksi"/>
+                            <field name="tensile_mpa"/>
+                            <field name="tensile_psi"/>
+                            <field name="tensile_ksi"/>
+                            <field name="elongation"/>
+                            <field name="r_value"/>
+                            <field name="n_value"/>
+                            <field name="olsen_id"/>
+                            <field name="olsen_od"/>
+                            <field name="rb_id"/>
+                            <field name="rb_od"/>
+                        </group>
+                        <group>
+                            <field name="grain_size"/>
+                            <field name="r_o_a"/>
+                            <field name="hardenability"/>
+                            <field name="charpy"/>
+                            <field name="olsen"/>
+                            <field name="brinell"/>
+                            <field name="ductility"/>
+                            <field name="rockwell" string="Rockwell"/>
+                        </group>
+                        <group>
+                            <field name="core_loss"/>
+                            <field name="permeability"/>
+                        </group>
+                        <group>
+                            <field name="heat_number"/>
+                            <field name="lift_number"/>
+                        </group>                   
+                    </group>  
+                </page>
+                <page string="Quality Remarks">
+                    <group>
+                        <group>
+                            <field name="visual_inspection_px"/>
+                            <field name="vendor"/>
+                            <field name="category"/>
+                            <field name="internal"/>
+                        </group>                      
+                    </group>  
+                </page>
+                <page string="Processor Details">
+                    <group>
+                        <group>
+                            <field name="tag_number_pr1" string="1st Processor Tags"/>
+                            <field name="tag_number_pr2" string="2st Processor Tags"/>
+                            <field name="tag_number_pr3" string="3st Processor Tags"/>
+                            <field name="tag_number_pr4" string="4st Processor Tags"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Purchase Details">
+                    <group>
+                        <group>
+                            <field name="date_received"/>
+                            <field name="po_number"/>
+                            <field name="loc_warehouse"/>
+                            <field name="vendor_name"/>
+                            <field name="vendor_id"/>
+                            <field name="loc_city"/>
+                            <field name="vendor_location_id"/>
+                            <field name="bill_of_lading" string="BOL Number"/>
+                        </group>
+                        <group>
+                            <field name="unit_cost"/>
+                            <field name="purchase_cose_untexed"/>
+                            <field name="purchase_cose_texed"/>
+                            <field name="heat_number"/>
+                            <field name="lift_number"/>
+                            <field name="certs"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Shipping Details">
+                    <group>
+                        <group>
+                            <field name="ship_from_id"/>
+                            <field name="ship_to_id"/>
+                            <field name="ship_via_id"/>
+                            <field name="purchase_incoterm_id"/>
+                            <field name="fob"/>
+                        </group>
+                        <group>
+                            <field name="date_time_recevied" string="Date Received"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

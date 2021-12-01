@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_button_purchase_order_line_add_space_form_view" model="ir.ui.view">
+        <field name="name">button.purchase.order.line.form</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="odx_product_custom_steel.button_purchase_order_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+            <notebook>
+               <page string="Line Items Information">
+                   <group>
+                       <group>
+                           <field name="vendor_tag_number"/>
+                           <field name="part_no"/>
+                           <field name="inventory_grade"/>
+                           <field name="finish"/>
+                           <field name="coating"/>
+                           <field name="res_nct_ct_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                           <label for="rb_min" string="RB(min-max)"/>
+                           <div class="o_row" >
+                               <field name="rb_min" class="oe_inline"/>
+                               <field name="rb_max" class="oe_inline"/>
+                           </div>
+                           <label for="rb_min" string="Olsen(min-max)"/>
+                           <div class="o_row">
+                               <field name="olsen_min" class="oe_inline"/>
+                               <field name="olsen_max" class="oe_inline"/>
+                           </div>
+                           <field name="res_gauge_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                           <label for="gauge_min" string="Gauge(min-max)"/>
+                           <div class="o_row">
+                               <field name="gauge_min" class="oe_inline"/>
+                               <field name="gauge_max" class="oe_inline"/>
+                           </div>
+                           <field name="width_in"/>
+                           <label for="width_tolerance_min" string="Width Tolerance(min-max)"/>
+                           <div class="o_row">
+                               <field name="width_tolerance_min" class="oe_inline"/>
+                               <field name="width_tolerance_max" class="oe_inline"/>
+                           </div>
+                           <field name="length_in"/>
+                           <label for="length_tolerance_min" string="Length Tolerance(min-max)"/>
+                           <div class="o_row">
+                               <field name="length_tolerance_min" class="oe_inline"/>
+                               <field name="length_tolerance_max" class="oe_inline"/>
+                           </div>
+                           <label for="sq_tolerance_min" string="Sq Tolerance High(min-max)"/>
+                           <div class="o_row">
+                               <field name="sq_tolerance_min" class="oe_inline"/>
+                               <field name="sq_tolerance_max" class="oe_inline"/>
+                           </div>
+                           <label for="id_min" string="ID(min-max)"/>
+                           <div class="o_row">
+                               <field name="id_min" class="oe_inline"/>
+                               <field name="id_max" class="oe_inline"/>
+                           </div>
+                           <label for="od_min" string="OD(min-max)"/>
+                           <div class="o_row">
+                               <field name="od_min" class="oe_inline"/>
+                               <field name="od_max" class="oe_inline"/>
+                           </div>
+                           <label for="coil_min" string="Coil(min-max)"/>
+                           <div class="o_row">
+                               <field name="coil_min" class="oe_inline"/>
+                               <field name="coil_max" class="oe_inline"/>
+                           </div>
+                           <field name="max_lift"/>
+                           <field name="surface"/>
+                           <field name="mill_stencil"/>
+                       </group>
+                   
+                       <group>
+                           <field name="ductility"/>
+                           <field name="part_category"/>
+                           <field name="res_edge_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                           <field name="spangle"/>
+                           <field name="coating_weight"/>
+                           <field name="res_oil_dry_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/> 
+                           <field name="res_gauge_type_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/> 
+                           <field name="res_receive_tag_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/> 
+                           <field name="certsreq" string="Certs"/>
+                           <field name="res_yte_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/> 
+                           <field name="release_no"/>
+                           <field name="res_dfars_domestic_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                           <field name="reserve_customer_id"/>
+                           <field name="condition"/>
+                           <field name="projection_number"/>
+                       </group>
+                   </group>
+               </page>
+                <page string="Chemical Properties">
+                    <table>
+                        <tr VALIGN="TOP">
+                            <td colspan='2'> Chemistry </td>
+                            <td> Non- Standard </td>
+                        </tr>
+                        <tr VALIGN="TOP">
+                            <td>
+                                <group>
+                                    <field name="chem_al"/>
+                                    <field name="chem_cu"/>
+                                    <field name="chem_cr"/>
+                                    <field name="chem_fe"/>
+                                    <field name="chem_mg"/>
+                                    <field name="chem_b"/>
+                                    <field name="chem_c"/>
+                                    <field name="chem_n"/>
+                                    <field name="chem_si"/>
+                                    <field name="chem_p"/>
+                                    <field name="chem_s"/>
+                                    <field name="chem_ca"/>
+                                    <field name="chem_ti"/>
+                                    <field name="chem_mn"/>
+                                    <field name="chem_co"/>
+                                    <field name="chem_ni"/>
+                                    <field name="chem_zn"/>
+                                    <field name="chem_nb_cb"/>
+                                </group>
+
+                            </td>
+                            <td>
+                                <group>
+                                    <field name="chem_mo"/>
+                                    <field name="chem_cd"/>
+                                    <field name="chem_sn"/>
+                                    <field name="chem_w"/>
+                                    <field name="chem_pb"/>
+                                    <field name="chem_bi"/>
+                                    <field name="chem_be"/>
+                                    <field name="chem_as"/>
+                                    <field name="chem_se"/>
+                                    <field name="chem_zr"/>
+                                    <field name="chem_ag"/>
+                                    <field name="chem_sb"/>
+                                    <field name="chem_au"/>
+                                    <field name="chem_o"/>
+                                    <field name="chem_v"/>
+                                    <field name="chem_y"/>
+                                    <field name="chem_h"/>
+                                </group>
+                            </td>
+                            <td>
+                                <group>
+                                    <field name="chem_soluble_aluminium"/>
+                                    <field name="chem_carbon_equivalent"/>
+                                    <field name="chem_residual_hydrogen"/>
+                                    <field name="chem_total_residual"/>
+                                </group>
+                            </td>
+                        </tr>
+                    </table>
+                </page>
+                <page string="Physical Properties">
+                    <group>
+                        <group>
+                            <field name="physical_yield"/>
+                            <field name="tensile"/>
+                            <field name="elongation"/>
+                            <field name="r_value"/>
+                            <field name="n_value"/>
+                            <field name="olsen_id"/>
+                            <field name="olsen_od"/>
+                            <field name="rb_id"/>
+                            <field name="rb_od"/>
+                        </group>
+                        <group>
+                            <field name="grain_size"/>
+                            <field name="r_o_a"/>
+                            <field name="hardenability"/>
+                            <field name="charpy"/>
+                            <field name="olsen"/>
+                            <field name="brinell"/>
+                            <field name="ductility"/>
+                        </group>
+                        <group>
+                            <field name="core_loss"/>
+                            <field name="permeability"/>
+                        </group>
+                        <group>
+                            <field name="heat_no"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Packaging Instructions">
+                    <group>
+                        <group>
+                            <field name="res_skid_cylinder_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                            <field name="res_eye_pos" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                            <field name="wind"/>
+                            <field name="spacers"/>
+                            <field name="bands_id"/>
+                            <field name="bands_od"/>
+                            <field name="cores" />
+                            <field name="interleave"/>
+                        </group>
+                        <group>
+                            <field name="edge_protection"/>
+                            <field name="package_type"/>
+                            <field name="protect_id"/>
+                            <field name="protect_od"/>
+                            <field name="skids"/>
+                            <field name="skid_bands"/>
+                            <field name="res_crane" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                            <field name="fork_lift"/>
+                        </group>
+                        <group>
+                           <field name="paper"/>
+                           <field name="vci_paper"/>
+                        </group>    
+                    </group>  
+                    <group>
+                        <group>
+                           <label for="packaging_instructions" string="Packaging Instructions"/>
+                        </group>
+                        <group>
+                           <label for="detailed_instructions" string="Detailed Instructions"/>
+                        </group>
+                        <group>
+                           <field name="packaging_instructions" nolabel='1'/>
+                        </group>
+                        <group>
+                           <field name="detailed_instructions"  nolabel='1'/>
+                        </group>
+                    </group>  
+                </page>
+            </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

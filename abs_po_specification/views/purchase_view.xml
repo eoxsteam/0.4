@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_odx_product_purchase_order_inherited_view" model="ir.ui.view">
+        <field name="name">purchase.inherit.view</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="odx_product_custom_steel.purchase_order_inherited_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_category_id']" position="before">
+                <field  name="vendor_tag_number" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+                <field  name="res_gauge_id" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='thickness_in']" position="after">
+                <field  name="thickness_min" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='thickness_in']" position="after">
+                <field  name="thickness_max" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='sub_category_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_category_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='date_planned']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='cwt_price']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='taxes_id']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='thickness_in']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='width_in']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='length_in']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='sale_order_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="sale_order_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="po_type_mat" model="res.po.type">
+        <field name="name">MAT</field>
+    </record>
+    <record id="po_type_prc" model="res.po.type">
+        <field name="name">PRC</field>
+    </record>
+</odoo>

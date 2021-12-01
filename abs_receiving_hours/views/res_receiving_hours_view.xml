@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_receiving_hours_tree" model="ir.ui.view">
+        <field name="name">res.receiving.hours.time.range.tree</field>
+        <field name="model">res.receiving.hours.time.range</field>
+        <field name="arch" type="xml">
+            <tree string="Time Range">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_res_receiving_hours_form" model="ir.ui.view">
+        <field name="name">res.receiving.hours.time.range.form</field>
+        <field name="model">res.receiving.hours.time.range</field>
+        <field name="arch" type="xml">
+            <form string="Time Range">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_res_receiving_hours" model="ir.actions.act_window">
+        <field name="name">Time Range</field>
+        <field name="res_model">res.receiving.hours.time.range</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_res_receiving_hours_tree"/>
+    </record>
+
+    <menuitem id="menu_receiving_hour_config"
+              parent="sale.menu_sale_config"
+              sequence="3"
+              name="Receiving Hours"/>
+
+    <menuitem id="sub_menu_time_range"
+              parent="menu_receiving_hour_config"
+              name="Time Range"
+              action="action_res_receiving_hours"/>
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_sale_order_form_view" model="ir.ui.view">
+        <field name="name">sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='other_information']" position="before">
+                <page string="Shipping Instructions">
+                    <group>
+                        <group>
+                            <field name="ship_via_id"/>
+                            <field name="incoterm" string="Incoterms"/>
+                            <field name="expected_delivery_date"/>
+                        </group>
+                        <group>
+                            <label for="max_bundle_weight"/>
+                            <div class="o_row">
+                               <field name="max_bundle_weight" class="oe_inline"/>
+                               <span class="oe_inline">Lbs</span>
+                            </div>
+                            <field name="fob"/>
+                        </group>
+                        <group string="Ship From">
+                            <field name="si_warehouse_id" string='Warehouse'/>
+                        </group>
+                        <group string="Ship To">
+                            <field name="customer_id" string='Customer'/>
+                            <field name="res_address_id" />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

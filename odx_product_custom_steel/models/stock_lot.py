@@ -139,6 +139,7 @@ class StockProductionLot(models.Model):
         ('transit', 'In Transit'),
         ('available', 'Available'),
         ('reserved', 'Reserved'),
+        ('re_run', 'To Re-Run'),
         ('in_production', 'In production'),
         ('not_available', 'Not available')
     ], string='Stock Status', default='available', track_visibility="onchange")

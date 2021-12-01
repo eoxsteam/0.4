@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_dfars_domestic_form_view" model="ir.ui.view">
+        <field name="name">res.dfars.domestic.form</field>
+        <field name="model">res.dfars.domestic</field>
+        <field name="arch" type="xml">
+            <form string="DFARS Domestic">
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>  
+                    </group>
+                </sheet>
+            </form>     
+        </field>
+    </record>
+    <record id="res_dfars_domestic_tree_view" model="ir.ui.view">
+        <field name="name">res.dfars.domestic.tree</field>
+        <field name="model">res.dfars.domestic</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_dfars_domestic_views" model="ir.actions.act_window">
+        <field name="name">DFARS Or Domastic</field>
+        <field name="res_model">res.dfars.domestic</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="res_dfars_domestic_tree_view"/>
+    </record>   
+
+    <menuitem
+            id="menu_action_dfars_domestic_views"
+            name="Dfars Domestic"
+            sequence="99"
+            parent="abs_crane.menu_specification"
+            action="action_dfars_domestic_views"/>
+</odoo>
+

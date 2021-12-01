@@ -1,0 +1,4 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+
+access_process_undergone,access_process_undergone,model_process_undergone,base.group_user,1,1,1,1
+access_res_grade,access_res_grade,model_res_grade,base.group_user,1,1,1,1

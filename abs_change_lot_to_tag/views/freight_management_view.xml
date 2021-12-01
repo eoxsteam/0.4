@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="freight_management_form_view_inh" model="ir.ui.view">
+        <field name="name">freight.management.form</field>
+        <field name="model">freight.management</field>
+        <field name="inherit_id" ref="odx_freight_management.view_receiving_management_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='frm_line_ids']/tree/field[@name='transported_lot_ids']" position="attributes">
+                <attribute name="string">Tags</attribute>
+            </xpath>
+            <xpath expr="//field[@name='cargo_lines']/tree/field[@name='lot_ids']" position="attributes">
+                <attribute name="string">Tags</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

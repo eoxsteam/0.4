@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<odoo>
+    <record model="res.groups" id="groups_show_purchase_other_information">
+        <field name="name">Show purchase other information</field>
+    </record>
+</odoo>

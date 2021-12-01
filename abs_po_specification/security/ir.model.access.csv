@@ -1,0 +1,12 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+
+access_res_dfars_domestic,access_res_dfars_domestic,model_res_dfars_domestic,base.group_user,1,1,1,1
+access_res_gauge,access_res_gauge,model_res_gauge,base.group_user,1,1,1,1
+access_res_gauge_type,access_res_gauge_type,model_res_gauge_type,base.group_user,1,1,1,1
+access_res_nct_ct,access_res_nct_ct,model_res_nct_ct,base.group_user,1,1,1,1
+access_res_oil_dry,access_res_oil_dry,model_res_oil_dry,base.group_user,1,1,1,1
+access_res_receive_tag,access_res_receive_tag,model_res_receive_tag,base.group_user,1,1,1,1
+access_res_yte,access_res_yte,model_res_yte,base.group_user,1,1,1,1
+access_res_edge,access_res_edge,model_res_edge,base.group_user,1,1,1,1
+access_res_skid_cylinder,access_res_skid_cylinder,model_res_skid_cylinder,base.group_user,1,1,1,1
+access_res_eye_pos,access_res_eye_pos,model_res_eye_pos,base.group_user,1,1,1,1

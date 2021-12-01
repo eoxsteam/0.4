@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_grade_view_tree_view" model="ir.ui.view">
+        <field name="name">res.grade.tree</field>
+        <field name="model">res.grade</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="res_grade_view_form_view" model="ir.ui.view">
+        <field name="name">res.grade.form</field>
+        <field name="model">res.grade</field>
+        <field name="arch" type="xml">
+            <form string="Grade">
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>  
+                    </group>
+                </sheet>
+            </form>     
+        </field>
+    </record>
+
+    <record id="action_grade_views" model="ir.actions.act_window">
+        <field name="name">Grade</field>
+        <field name="res_model">res.grade</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="res_grade_view_tree_view"/>
+    </record>   
+    
+    <menuitem
+            id="menu_action_grade_views"
+            name="Grade"
+            parent="menu_lot_configration"
+            action="action_grade_views"/>
+</odoo>
+

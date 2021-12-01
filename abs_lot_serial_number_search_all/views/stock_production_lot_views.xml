@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_search_product_lot_filter" model="ir.ui.view">
+        <field name="name">Production Lots Filter</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.search_product_lot_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="replace">
+                <field name="name" string="Lot/Serial Number"
+                       filter_domain="['|', '|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|','|',
+                                      ('name', 'ilike', self),
+                                      ('ref', 'ilike', self), 
+                                      ('product_id.name', 'ilike', self),
+                                      ('stock_status', 'ilike', self),
+                                      ('sub_category_id.name', 'ilike', self),
+                                      ('vendor_name', 'ilike', self),
+                                      ('vendor_location_id.name', 'ilike', self),
+                                      ('vendor_id.name', 'ilike', self),
+                                      ('thickness_in', 'ilike', self),
+                                      ('width_in', 'ilike', self),
+                                      ('thickness_mm', 'ilike', self),
+                                      ('width_mm', 'ilike', self),
+                                      ('length_mm', 'ilike', self),
+                                      ('bill_of_lading', 'ilike', self),
+                                      ('loc_city', 'ilike', self),
+                                      ('heat_number', 'ilike', self),
+                                      ('lift_number', 'ilike', self),
+                                      ('part_number', 'ilike', self),
+                                      ('tag_number', 'ilike', self),
+                                      ('location', 'ilike', self),
+                                      ('vendor', 'ilike', self),
+                                      ('category', 'ilike', self),
+                                      ('internal', 'ilike', self),
+                                      ('date_removed', 'ilike', self),
+                                      ('internet_serial', 'ilike', self),
+                                      ('date_received', 'ilike', self),
+                                      ('po_number', 'ilike', self),
+                                      ('length_in', 'ilike', self),
+                                      ('thickness_spec', 'ilike', self),
+                                      ('grade', 'ilike', self),
+                                      ('rockwell', 'ilike', self),
+                                      ('elongation', 'ilike', self),
+                                      ('yield_mpa', 'ilike', self),
+                                      ('yield_psi', 'ilike', self),
+                                      ('yield_ksi', 'ilike', self),
+                                      ('tensile_mpa', 'ilike', self),
+                                      ('tensile_psi', 'ilike', self),
+                                      ('tensile_ksi', 'ilike', self),
+                                      ('quality', 'ilike', self),
+                                      ('create_date', 'ilike', self)]"/>    
+            </xpath>
+        </field>
+    </record>
+</odoo>

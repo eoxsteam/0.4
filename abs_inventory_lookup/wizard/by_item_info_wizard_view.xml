@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_by_item_info_form" model="ir.ui.view">
+       <field name="name">by.item.info.wizard.form</field>
+       <field name="model">by.item.info.wizard</field>
+       <field name="arch" type="xml">
+           <form string="By Item Info">
+               <group>
+                   <group> 
+                       <field name="info_category_id"/>
+                       <field name="info_sub_category_id"/>
+                       <field name="info_sub_product_id"/> 
+                   </group>
+                   <group>
+                       <field name="info_partner_id"/>
+                       <field name="info_partner_no_id"/>
+                       <field name="info_partner_reserver_id"/>   
+                   </group>
+               </group>
+               <group>
+                   <group>
+                       <label for="info_gauge_min"/>
+                       <div class="o_row">
+                           <field name="info_gauge_min"/>
+                           <field name="info_gauge_max"/>
+                       </div>
+                       <label for="info_thickness_min"/>
+                       <div class="o_row">
+                           <field name="info_thickness_min"/>
+                           <field name="info_thickness_max"/>
+                       </div>
+                       <label for="info_width_min"/>
+                       <div class="o_row">
+                           <field name="info_width_min"/>
+                           <field name="info_width_max"/>
+                           <field name="info_width_selection"/>
+                       </div>
+                       <label for="info_length_min"/>
+                       <div class="o_row">
+                           <field name="info_length_min"/>
+                           <field name="info_length_max"/>
+                           <field name="info_len_selection"/>
+                       </div>
+                       <label for="info_weight_min"/>
+                       <div class="o_row">
+                           <field name="info_weight_min"/>
+                           <field name="info_weight_max"/>
+                           <field name="info_weight_selection"/>
+                       </div>  
+                   </group>
+                   <group>
+                       <field name="info_nct_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                       <field name="info_oil_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                       <label for="info_id_gauge_min"/>
+                       <div class="o_row">
+                           <field name="info_id_gauge_min"/>
+                           <field name="info_id_gauge_max"/>
+                       </div>
+                       <label for="info_od_gauge_min"/>
+                       <div class="o_row">
+                           <field name="info_od_gauge_min"/>
+                           <field name="info_od_gauge_max"/>
+                       </div>
+                       <label for="info_piw_min"/>
+                       <div class="o_row">
+                           <field name="info_piw_min"/>
+                           <field name="info_piw_max"/>
+                       </div>
+                   </group>
+               </group>
+               <group>
+                   <group string="Physicals">
+                       <label for="info_yield_min"/>
+                       <div class="o_row">
+                           <field name="info_yield_min"/>
+                           <field name="info_yield_max"/>
+                           <field name="info_yield_selection"/> 
+                       </div>
+                       <label for="info_tensile_min"/>
+                       <div class="o_row">
+                           <field name="info_tensile_min"/>
+                           <field name="info_tensile_max"/>
+                           <field name="info_tensile_selection"/>
+                       </div>
+                       <label for="info_elongation_min"/>
+                       <div class="o_row">
+                           <field name="info_elongation_min"/>
+                           <field name="info_elongation_max"/>
+                       </div>            
+                   </group>
+                   <group string="Dates">
+                       <field name="info_received" widget="radio" string="Received" class="o_row"/>                           
+                       <field name="info_start_date" string="Received"/>
+                       <field name="info_end_date" string="Sold"/>
+                       <field name="info_stock_status"/>             
+                   </group>
+               </group>  
+               <footer>
+                   <button string="Search" name="button_by_item_info_search" type="object" class="btn-primary"/>
+                   <button string='Cancel' class='btn-default' special="cancel"/>
+               </footer>
+          </form>
+       </field>
+    </record>
+
+    <record id="action_by_item_info" model="ir.actions.act_window">
+        <field name="name">By Item Info</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">by.item.info.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="abs_inventory_lookup.view_by_item_info_form"/>
+        <field name="binding_view_types">form</field> 
+    </record>     
+   
+    <menuitem id="menu_inventory_lookup" 
+              name="Inventory Lookup"
+              sequence="99" 
+              parent="stock.menu_stock_root"/>
+
+    <menuitem id="submenu_by_item_info" 
+              action="action_by_item_info" 
+              parent="menu_inventory_lookup"/>
+</odoo>

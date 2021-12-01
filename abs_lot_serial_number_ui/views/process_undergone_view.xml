@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="process_undergone_view_tree_view" model="ir.ui.view">
+        <field name="name">process.undergone.tree</field>
+        <field name="model">process.undergone</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="process_undergone_view_form_view" model="ir.ui.view">
+        <field name="name">process.undergone.form</field>
+        <field name="model">process.undergone</field>
+        <field name="arch" type="xml">
+            <form string="Process Undergone">
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>  
+                    </group>
+                </sheet>
+            </form>     
+        </field>
+    </record>
+
+    <record id="action_process_undergone" model="ir.actions.act_window">
+        <field name="name">Process Undergone</field>
+        <field name="res_model">process.undergone</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="process_undergone_view_tree_view"/>
+    </record>
+
+    <menuitem
+            id="menu_lot_configration"
+            name="Lot Configration"
+            parent="stock.menu_stock_config_settings"/>
+    
+    <menuitem
+            id="menu_process_undergone"
+            name="Process Undergone"
+            parent="menu_lot_configration"
+            action="action_process_undergone"/>
+</odoo>
+

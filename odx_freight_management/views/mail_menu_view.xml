@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <menuitem
+        id="mail.menu_root_discuss"
+        name="IM"
+        />
+    </data>
+</odoo>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record model="res.groups" id="group_hide_lot_serial_numbers_header">
+        <field name="name">Show Confirm on Lot/Serial number</field>
+    </record>
+</odoo>

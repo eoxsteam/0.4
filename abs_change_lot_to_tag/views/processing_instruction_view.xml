@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="processing_instructions_form_view_inh" model="ir.ui.view">
+        <field name="name">processing.instructions.form.view</field>
+        <field name="model">production.instructions</field>
+        <field name="inherit_id" ref="odx_steel_production.processing_instructions_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_line_ids']/tree/field[@name='finished_lot_id']" position="attributes">
+                <attribute name="string">Tag #</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

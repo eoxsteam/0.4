@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+        <record id="process_undergone_data_1" model="process.undergone">
+            <field name="name">Slitting</field>
+        </record>
+        <record id="process_undergone_data_2" model="process.undergone">
+            <field name="name">Cut to Length</field>
+        </record>
+        <record id="process_undergone_data_3" model="process.undergone">
+            <field name="name">Break for Weight(Parting)</field>
+        </record>
+        <record id="process_undergone_data_4" model="process.undergone">
+            <field name="name">MultiStage</field>
+        </record>
+        <record id="process_undergone_data_5" model="process.undergone">
+            <field name="name">Annealing</field>
+        </record>
+        <record id="process_undergone_data_6" model="process.undergone">
+            <field name="name">Cold Rolling</field>
+        </record>
+        <record id="process_undergone_data_7" model="process.undergone">
+            <field name="name">DeGreasing</field>
+        </record>
+        <record id="process_undergone_data_8" model="process.undergone">
+            <field name="name">Temper Rolling</field>
+        </record>
+        <record id="process_undergone_data_9" model="process.undergone">
+            <field name="name">Pickling</field>
+        </record>
+    </data>
+
+</odoo>

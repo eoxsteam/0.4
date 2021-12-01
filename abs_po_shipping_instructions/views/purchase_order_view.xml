@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_purchase_order_form" model="ir.ui.view">
+        <field name="name">purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[3]" position="before">
+                <page string="Shipping Instructions">
+                    <group>
+                        <group>
+                            <label for="res_receiving_hours_id"/>
+                            <div class="o_row">
+                                <field name="res_receiving_hours_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                                <field name="res_receiving_day_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                            </div>
+                            <field name="max_bundle_weight"/>
+                            <field name="crane_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                        </group>
+                        <group>
+                            <field name="release_no"/>
+                            <field name="forklift"/>
+                            <field name="ship_to"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
