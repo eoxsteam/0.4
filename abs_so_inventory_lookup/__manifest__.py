@@ -20,9 +20,9 @@
 #################################################################################
 {
     "name": "So Inventory Lookup",
-    "description":"Sale Order Add Page Inventory Lookup Add Buttons",
+    "description": "Sale Order Add Page Inventory Lookup Add Buttons",
     "summary": """So Inventory Lookup""",
-    "vesion":"13.0.1.0",
+    "vesion": "13.0.1.1",
     "category": "Sales",
     "website": "http://www.asceticbs.com",
     "author": "Ascetic Business Solution",
@@ -30,11 +30,13 @@
     "installable": True,
     "auto_install": False,
     "depends": ["base",
-                "abs_inventory_lookup"
-               ],
+                "abs_inventory_lookup",
+                "one2many_selection",
+                ],
     "data": [
-             "views/sale_order_view.xml",
-            ],
+        "security/ir.model.access.csv",
+        "views/sale_order_view.xml",
+    ],
     "demo": [],
     "qweb": [],
 }

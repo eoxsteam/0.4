@@ -6,11 +6,391 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook/page[@name='order_lines']" position="after">
-                <page string="Inventory Look Up" name="inventory_look_up">
-                    <group>
-                        <button name="button_inventory_lookup_by_item" type="object" string="By Item Info" class="btn-primary" />
-                        <button name="button_inventory_lookup_by_chemistries" type="object" string="By Chemistries" class="btn-primary"/>
-                    </group>
+                <page string="Inventory Look Up BY Item" name="inventory_look_up_by_items">
+                    <field name="inventory_look_up_by_item_ids" widget="one2many_selectable">
+                        <tree>
+                            <field name="so_look_up_by_item_id" invisible="1"/>
+                            <field name="info_sub_product_id"/>
+                            <field name="info_stock_status" string="Status"/>
+                            <field name="info_gauge_min" string="Gauge"/>
+                            <field name="info_thickness_min" string="Thickness"/>
+                            <field name="info_width_min" string="Width"/>
+                            <field name="info_length_min" string="Length"/>
+                            <field name="info_weight_min" string="Weight"/>
+                        </tree>
+                        <form>
+                            <sheet>
+                                <group>
+                                    <group>
+                                        <field name="info_category_id"/>
+                                        <field name="info_sub_category_id"/>
+                                        <field name="info_sub_product_id"/>
+                                    </group>
+                                    <group>
+                                        <field name="info_partner_id"/>
+                                        <field name="info_partner_no_id"/>
+                                        <field name="info_partner_reserver_id"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group>
+                                        <label for="info_gauge_min"/>
+                                        <div class="o_row">
+                                            <field name="info_gauge_min"/>
+                                            <field name="info_gauge_max"/>
+                                        </div>
+                                        <label for="info_thickness_min"/>
+                                        <div class="o_row">
+                                            <field name="info_thickness_min"/>
+                                            <field name="info_thickness_max"/>
+                                        </div>
+                                        <label for="info_width_min"/>
+                                        <div class="o_row">
+                                            <field name="info_width_min"/>
+                                            <field name="info_width_max"/>
+                                            <field name="info_width_selection"/>
+                                        </div>
+                                        <label for="info_length_min"/>
+                                        <div class="o_row">
+                                            <field name="info_length_min"/>
+                                            <field name="info_length_max"/>
+                                            <field name="info_len_selection"/>
+                                        </div>
+                                        <label for="info_weight_min"/>
+                                        <div class="o_row">
+                                            <field name="info_weight_min"/>
+                                            <field name="info_weight_max"/>
+                                            <field name="info_weight_selection"/>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <field name="info_nct_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                                        <field name="info_oil_id" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                                        <label for="info_id_gauge_min"/>
+                                        <div class="o_row">
+                                            <field name="info_id_gauge_min"/>
+                                            <field name="info_id_gauge_max"/>
+                                        </div>
+                                        <label for="info_od_gauge_min"/>
+                                        <div class="o_row">
+                                            <field name="info_od_gauge_min"/>
+                                            <field name="info_od_gauge_max"/>
+                                        </div>
+                                        <label for="info_piw_min"/>
+                                        <div class="o_row">
+                                            <field name="info_piw_min"/>
+                                            <field name="info_piw_max"/>
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Physicals">
+                                        <label for="info_yield_min"/>
+                                        <div class="o_row">
+                                            <field name="info_yield_min"/>
+                                            <field name="info_yield_max"/>
+                                            <field name="info_yield_selection"/>
+                                        </div>
+                                        <label for="info_tensile_min"/>
+                                        <div class="o_row">
+                                            <field name="info_tensile_min"/>
+                                            <field name="info_tensile_max"/>
+                                            <field name="info_tensile_selection"/>
+                                        </div>
+                                        <label for="info_elongation_min"/>
+                                        <div class="o_row">
+                                            <field name="info_elongation_min"/>
+                                            <field name="info_elongation_max"/>
+                                        </div>
+                                    </group>
+                                    <group string="Dates">
+                                        <field name="info_received" widget="radio" string="Received" class="o_row"/>
+                                        <field name="info_start_date" string="Received"/>
+                                        <field name="info_end_date" string="Sold"/>
+                                        <field name="info_stock_status"/>
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//notebook/page[@name='inventory_look_up_by_items']" position="after">
+                <page string="Inventory Look Up By Chemistries" name="inventory_look_up_by_chemistries">
+                    <field name="inventory_look_up_by_chemistries_ids" widget="one2many_selectable">
+                        <tree>
+                            <field name="so_look_up_by_chemistries_id" invisible="1"/>
+                            <field name="chem_sub_product_id"/>
+                            <field name="chem_stock_status" string="Status"/>
+                            <field name="chem_gauge_min" string="Gauge"/>
+                            <field name="chem_thickness_min" string="Thickness"/>
+                            <field name="chem_width_min" string="Width"/>
+                            <field name="chem_length_min" string="Length"/>
+                            <field name="chem_weight_min" string="Weight"/>
+                        </tree>
+                        <form>
+                            <sheet>
+                                <group>
+                                    <group>
+                                        <field name="chem_category_id" string="Master"/>
+                                        <field name="chem_sub_category_id" string="Sub Category"/>
+                                        <field name="chem_sub_product_id" string="Sub Product"/>
+                                    </group>
+                                    <group>
+                                        <field name="chem_partner_id" string="Vendor"/>
+                                        <field name="chem_partner_no_id" string="Vendor No."/>
+                                        <field name="chem_partner_reserver_id" string="Reserve Customer"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group>
+                                        <label for="chem_gauge_min" string="Gauge(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_gauge_min"/>
+                                            <field name="chem_gauge_max"/>
+                                        </div>
+                                        <label for="chem_thickness_min" string="Thickness(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_thickness_min"/>
+                                            <field name="chem_thickness_max"/>
+                                        </div>
+                                        <label for="chem_width_min" string="Width(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_width_min"/>
+                                            <field name="chem_width_max"/>
+                                            <field name="chem_width_selection"/>
+                                        </div>
+                                        <label for="chem_length_min" string="Length(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_length_min"/>
+                                            <field name="chem_length_max"/>
+                                            <field name="chem_len_selection"/>
+                                        </div>
+                                        <label for="chem_weight_min" string="Weight(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_weight_min"/>
+                                            <field name="chem_weight_max"/>
+                                            <field name="chem_weight_selection"/>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <field name="chem_nct_id" string="NCT/CT" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                                        <field name="chem_oil_id" string="Dry/Oil" options="{'no_create_edit': True,'no_quick_create':True}"/>
+                                        <label for="chem_id_gauge_min" string="ID Gauge(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_id_gauge_min"/>
+                                            <field name="chem_id_gauge_max"/>
+                                        </div>
+                                        <label for="chem_od_gauge_min" string="OD Gauge(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_od_gauge_min"/>
+                                            <field name="chem_od_gauge_max"/>
+                                        </div>
+                                        <label for="chem_piw_min" string="PIW(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_piw_min"/>
+                                            <field name="chem_piw_max"/>
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Physicals">
+                                        <label for="chem_yield_min" string="Yield(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_yield_min"/>
+                                            <field name="chem_yield_max"/>
+                                            <field name="chem_yield_selection"/>
+                                        </div>
+                                        <label for="chem_tensile_min" string="Tensile(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_tensile_min"/>
+                                            <field name="chem_tensile_max"/>
+                                            <field name="chem_tensile_selection"/>
+                                        </div>
+                                        <label for="chem_elongation_min" string="Elongation(Min-Max)"/>
+                                        <div class="o_row">
+                                            <field name="chem_elongation_min"/>
+                                            <field name="chem_elongation_max"/>
+                                        </div>
+                                    </group>
+                                    <group string="Dates">
+                                        <div class="o_row">
+                                            <field name="chem_received" widget="radio" string="Received"/>
+                                        </div>
+                                        <field name="chem_start_date" string="Received"/>
+                                        <field name="chem_end_date" string="Sold"/>
+                                        <field name="chem_stock_status" string="Stock Status"/>
+                                    </group>
+                                </group>
+                                <group string="Chemistries">
+                                    <group>
+                                        <label for="chem_al_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_al_min"/>
+                                            <field name="chem_al_max"/>
+                                        </div>
+                                        <label for="chem_cu_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_cu_min"/>
+                                            <field name="chem_cu_max"/>
+                                        </div>
+                                        <label for="chem_cr_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_cr_min"/>
+                                            <field name="chem_cr_max"/>
+                                        </div>
+                                        <label for="chem_fe_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_fe_min"/>
+                                            <field name="chem_fe_max"/>
+                                        </div>
+                                        <label for="chem_mg_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_mg_min"/>
+                                            <field name="chem_mg_max"/>
+                                        </div>
+                                        <label for="chem_b_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_b_min"/>
+                                            <field name="chem_b_max"/>
+                                        </div>
+                                        <label for="chem_c_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_c_min"/>
+                                            <field name="chem_c_max"/>
+                                        </div>
+                                        <label for="chem_n_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_n_min"/>
+                                            <field name="chem_n_max"/>
+                                        </div>
+                                        <label for="chem_si_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_si_min"/>
+                                            <field name="chem_si_max"/>
+                                        </div>
+                                        <label for="chem_p_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_p_min"/>
+                                            <field name="chem_p_max"/>
+                                        </div>
+                                        <label for="chem_s_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_s_min"/>
+                                            <field name="chem_s_max"/>
+                                        </div>
+                                        <label for="chem_ca_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_ca_min"/>
+                                            <field name="chem_ca_max"/>
+                                        </div>
+                                        <label for="chem_ti_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_ti_min"/>
+                                            <field name="chem_ti_max"/>
+                                        </div>
+                                        <label for="chem_mn_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_mn_min"/>
+                                            <field name="chem_mn_max"/>
+                                        </div>
+                                        <label for="chem_co_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_co_min"/>
+                                            <field name="chem_co_max"/>
+                                        </div>
+                                        <label for="chem_ni_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_ni_min"/>
+                                            <field name="chem_ni_max"/>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <label for="chem_mo_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_mo_min"/>
+                                            <field name="chem_mo_max"/>
+                                        </div>
+                                        <label for="chem_cd_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_cd_min"/>
+                                            <field name="chem_cd_max"/>
+                                        </div>
+                                        <label for="chem_sn_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_sn_min"/>
+                                            <field name="chem_sn_max"/>
+                                        </div>
+                                        <label for="chem_w_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_w_min"/>
+                                            <field name="chem_w_max"/>
+                                        </div>
+                                        <label for="chem_pb_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_pb_min"/>
+                                            <field name="chem_pb_max"/>
+                                        </div>
+                                        <label for="chem_bi_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_bi_min"/>
+                                            <field name="chem_bi_max"/>
+                                        </div>
+                                        <label for="chem_be_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_be_min"/>
+                                            <field name="chem_be_max"/>
+                                        </div>
+                                        <label for="chem_as_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_as_min"/>
+                                            <field name="chem_as_max"/>
+                                        </div>
+                                        <label for="chem_se_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_se_min"/>
+                                            <field name="chem_se_max"/>
+                                        </div>
+                                        <label for="chem_zr_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_zr_min"/>
+                                            <field name="chem_zr_max"/>
+                                        </div>
+                                        <label for="chem_ag_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_ag_min"/>
+                                            <field name="chem_ag_max"/>
+                                        </div>
+                                        <label for="chem_sb_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_sb_min"/>
+                                            <field name="chem_sb_max"/>
+                                        </div>
+                                        <label for="chem_au_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_au_min"/>
+                                            <field name="chem_au_max"/>
+                                        </div>
+                                        <label for="chem_zn_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_zn_min"/>
+                                            <field name="chem_zn_max"/>
+                                        </div>
+                                        <label for="chem_v_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_v_min"/>
+                                            <field name="chem_v_max"/>
+                                        </div>
+                                        <label for="chem_nb_cb_min"/>
+                                        <div class="o_row">
+                                            <field name="chem_nb_cb_min"/>
+                                            <field name="chem_nb_cb_max"/>
+                                        </div>
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
                 </page>
             </xpath>
         </field>

@@ -1,0 +1,4 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+
+access_inventory_look_up_by_item,inventory.look.up.by.item,model_inventory_look_up_by_item,base.group_user,1,1,1,1
+access_inventory_look_up_by_chemistries,inventory.look.up.by.chemistries,model_inventory_look_up_by_chemistries,base.group_user,1,1,1,1
