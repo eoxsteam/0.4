@@ -104,20 +104,20 @@
                         <tr VALIGN="TOP">
                             <td>
                                 <group>
+                                    <field name="chem_c"/>
+                                    <field name="chem_mn"/>
+                                    <field name="chem_p"/>
+                                    <field name="chem_s"/>
                                     <field name="chem_al"/>
+                                    <field name="chem_ti"/>
                                     <field name="chem_cu"/>
                                     <field name="chem_cr"/>
                                     <field name="chem_fe"/>
                                     <field name="chem_mg"/>
                                     <field name="chem_b"/>
-                                    <field name="chem_c"/>
                                     <field name="chem_n"/>
                                     <field name="chem_si"/>
-                                    <field name="chem_p"/>
-                                    <field name="chem_s"/>
                                     <field name="chem_ca"/>
-                                    <field name="chem_ti"/>
-                                    <field name="chem_mn"/>
                                     <field name="chem_co"/>
                                     <field name="chem_ni"/>
                                     <field name="chem_zn"/>
