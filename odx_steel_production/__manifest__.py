@@ -28,6 +28,7 @@
         # 'views/stock_valuation.xml',
         'reports/barcode_production.xml',
         'reports/barcode_job_order.xml',
+ 	'reports/production_qweb_report.xml',
         'wizard/cancel_wizard.xml',
         'wizard/jo_cancel_wizard.xml',
         'wizard/attchment_wizard.xml',
