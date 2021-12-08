@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_assets_common_custom_fonts" name="Custom QWeb fonts" inherit_id="web.report_assets_common">
+            <xpath expr="." position="inside">
+                <link href="//db.onlinewebfonts.com/c/046f6eb7123bd1ba75f6b2f6582d53b0?family=Didact+Gothic" rel="stylesheet" type="text/css" />
+            </xpath>
+        </template>
+        <record id="paperformat_production_report" model="report.paperformat">
+            <field name="name">Custom Report</field>
+            <field name="default" eval="True" />
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">25</field>
+            <field name="margin_bottom">16</field>
+            <field name="margin_left">8</field>
+            <field name="margin_right">13.2</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">15</field>
+            <field name="dpi">90</field>
+        </record>
+        <report id="action_vitco_production_report" string="Production Report" model="production.instructions" report_type="qweb-pdf" file="odx_steel_production.vitco_production_report" name="odx_steel_production.vitco_production_report" print_report_name="'Production Report'" paperformat="odx_steel_production.paperformat_production_report" />
+        <template id="vitco_production_report_doc">
+            <t t-call="web.basic_layout">
+                <!--                          <style type="text/css">
+                    @font-face {
+                        font-family: "Didact Gothic";
+                        src: url("//db.onlinewebfonts.com/t/046f6eb7123bd1ba75f6b2f6582d53b0.eot");
+                        src: url("//db.onlinewebfonts.com/t/046f6eb7123bd1ba75f6b2f6582d53b0.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/046f6eb7123bd1ba75f6b2f6582d53b0.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/046f6eb7123bd1ba75f6b2f6582d53b0.woff") format("woff"), url("//db.onlinewebfonts.com/t/046f6eb7123bd1ba75f6b2f6582d53b0.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/046f6eb7123bd1ba75f6b2f6582d53b0.svg#Didact Gothic") format("svg");
+                    }
+
+                    .page {
+                        font-family: 'Didact Gothic';
+
+                    }
+                    </style> -->
+                <div class="header o_clean_header">
+                    <div class="col-xs-12">
+                        <div class="col-9 pull-left">
+                            <h4 style="font-family:Didact Gothic">Work Order : <span t-esc='o.name' /></h4>
+                        </div>
+                        <div class="col-3 pull-right">
+                            <h3 style="font-family:Didact Gothic">Page : <span class="page" />
+                            </h3>
+                        </div>
+                        <hr style="border-bottom: 2px dashed black; width:25cm; margin-left:-2cm;" />
+                    </div>
+                </div>
+                <div class='page'>
+                    <t t-foreach="o.run_line_ids" t-as="doc">
+                        <div class="col-xs-12">
+                            <div class="col-6 pull-left">
+                                <span t-esc='doc.name' />
+                            </div>
+                            <div class="col-6 pull-right">
+                                <h6 style="font-family:Didact Gothic">Machine :
+                                    <span t-esc='doc.machine_id.name' />
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="col-6 pull-left">
+                                <h6 style="font-family:Didact Gothic">Operation :
+                                    <span t-esc='doc.operation' />
+                                </h6>
+                            </div>
+                            <div class="col-6 pull-right">
+                                <h6 style="font-family:Didact Gothic">Scrap :
+                                    <span t-esc='doc.scrap_percent' />
+                                </h6>
+                            </div>
+                        </div>
+                        <table class="table table-sm o_main_table">
+                            <thead>
+                                <tr>
+                                    <th name="th_tag" class="text-left">Tag#</th>
+                                    <th name="th_product" class="text-center">Product</th>
+                                    <th name="th_grade" class="text-center">Grade</th>
+                                    <th name="th_rock" class="text-center">Rockwell</th>
+                                    <th name="th_id" class="text-center">ID</th>
+                                    <th name="th_od" class="text-center">OD</th>
+                                    <th name="th_gauge" class="text-center">Thickness</th>
+                                    <th name="th_width" class="text-center">Width</th>
+                                    <th name="th_length" class="text-center">Length</th>
+                                    <th name="th_weight" class="text-center">Weigth</th>
+                                    <th name="th_loc" class="text-center">Location</th>
+                                    <th name="th_qty" class="text-right">Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if='doc.instruction_run_line_ids'>
+                                    <t t-foreach="doc.instruction_run_line_ids" t-as="d">
+                                        <tr>
+                                            <td name="td_tag" class="text-left"><span t-esc='d.lot_id.name' /></td>
+                                            <td name="td_pro" class="text-center"><span t-esc='d.lot_id.product_id.name' /></td>
+                                            <td name="td_grade" class="text-center"><span t-esc='d.lot_id.grade' /></td>
+                                            <td name="td_rock" class="text-center"><span t-esc='d.lot_id.rockwell' /></td>
+                                            <td name="td_id" class="text-center"></td>
+                                            <td name="td_od" class="text-center"></td>
+                                            <td name="td_gauge" class="text-center"><span t-esc='d.thickness_in' /></td>
+                                            <td name="td_width" class="text-center"><span t-esc='d.width_in' /></td>
+                                            <td name="td_length" class="text-center"></td>
+                                            <td name="td_weight" class="text-center"><span t-esc='d.product_qty' /></td>
+                                            <td name="td_loc" class="text-center"><span t-esc='d.src_warehouse_id.name' /></td>
+                                            <td name="td_qty" class="text-right"></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm o_main_table">
+                            <tbody>
+                                <t t-if='doc.instruction_run_line_ids'>
+                                    <t t-foreach="doc.instruction_run_line_ids" t-as="d">
+                                        <tr>
+                                            <div class="col-12">
+                                                <h4> Set Up ( <span t-esc='d.setup_instruction_id.lot_id.name' /> ) </h4>
+                                            </div>
+                                        </tr>
+                                        <th>
+                                        <th name="th_cuts" class="text-left">No. of Cuts</th>
+                                        <th name="th_wid" class="text-left">Width</th>
+                                        </th>
+                                        <t t-foreach="d.setup_instruction_id.setup_instructions_line_ids" t-as="b">
+                                            <tr>
+                                                <td name="td_cut" class="text-right"><span t-esc='b.no_of' /></td>
+                                                <td name="td_wid" class="text-right"><span t-esc='b.width' /></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                        <div class="col-12">
+                            <h4> Action </h4>
+                        </div>
+                        <table class="table table-sm o_main_table">
+                            <thead>
+                                <tr>
+                                    <th name="th_tag" class="text-left">New Tag#</th>
+                                    <th name="th_product" class="text-center">Product</th>
+                                    <th name="th_gauge" class="text-center">Thickness</th>
+                                    <th name="th_width" class="text-center">Width</th>
+                                    <!--       <th name="th_length" class="text-center">Length</th> -->
+                                    <th name="th_weight" class="text-center">Weigth</th>
+                                    <th name="th_qty" class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if='doc.instruction_run_line_ids'>
+                                    <t t-foreach="doc.tag_line_ids" t-as="d">
+                                        <tr>
+                                            <td name="td_tag" class="text-left"><span t-esc='d.finished_lot_id.name' /></td>
+                                            <td name="td_pro" class="text-center"><span t-esc='d.product_id.name' /></td>
+                                            <td name="td_gauge" class="text-center"><span t-esc='d.thickness_in' /></td>
+                                            <td name="td_width" class="text-center"><span t-esc='d.width_in' /></td>
+                                            <td name="td_length" class="text-center"></td>
+                                            <td name="td_loc" class="text-right"><span t-esc='d.action' /></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                        <t t-if='doc.tag_line_ids'>
+                            <table class="table table-sm o_main_table">
+                                <thead>
+                                    <tr>
+                                        <th name="th_tag" class="text-left">Sale Order#</th>
+                                        <th name="th_product" class="text-center">Tag No.</th>
+                                        <th name="th_gauge" class="text-center">Customer PO</th>
+                                        <!--   <th name="th_width" class="text-center">Grade</th> -->
+                                        <!--       <th name="th_length" class="text-center">Length</th> -->
+                                        <th name="th_gauge" class="text-center">Thickness</th>
+                                        <th name="th_width" class="text-center">Width</th>
+                                        <th name="th_length" class="text-center">Length</th>
+                                        <th name="th_weight" class="text-center">Weigth</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="doc.tag_line_ids" t-as="d">
+                                        <t t-if='d.order_line_id'>
+                                            <tr>
+                                                <td name="td_tag" class="text-left"><span t-esc='d.order_line_id.order_id.name' /></td>
+                                                <td name="td_pro" class="text-center"><span t-esc='d.order_line_id.lot_id.name' /></td>
+                                                <td name="td_gauge" class="text-center"><span t-esc='d.order_line_id.order_id.customer_po_number' /></td>
+                                                <!--  <td name="td_length" class="text-center"><span t-esc="d.order_line_id.product_qty"/></td>
+                                         -->
+                                                <td name="td_loc" class="text-right"><span t-esc='d.order_line_id.thickness_in' /></td>
+                                                <td name="td_loc" class="text-right"><span t-esc='d.order_line_id.width_in' /></td>
+                                                <td name="td_loc" class="text-right"><span t-esc='d.order_line_id.length_in' /></td>
+                                                <td name="td_loc" class="text-right"><span t-esc='d.order_line_id.product_uom_qty' /></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </t>
+                </div>
+            </t>
+        </template>
+        <template id="vitco_production_report">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="odx_steel_production.vitco_production_report_doc" />
+            </t>
+        </template>
+    </data>
+</odoo>
