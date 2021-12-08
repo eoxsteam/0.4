@@ -25,10 +25,43 @@ from odoo import api, models, fields, _
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    client_order_ref = fields.Char(string='Customer ID', copy=False)
+
     inventory_look_up_by_item_ids = fields.One2many('inventory.look.up.by.item', 'so_look_up_by_item_id',
-                                                    'By Item')
+                                                    'By Item', ondelete='set null')
     inventory_look_up_by_chemistries_ids = fields.One2many('inventory.look.up.by.chemistries', 'so_look_up_by_chemistries_id',
-                                                           'By Chemistries')
+                                                           'By Chemistries', ondelete='set null')
+
+
+    def button_inventory_lookup_by_item(self):
+        return {
+            "name": _("By Item Info"),
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            "res_model": "by.item.info.wizard",
+            "views": [(False, "form")],
+            "view_id": self.env.ref("abs_inventory_lookup.view_by_item_info_form",
+                                    "False"),
+            "target": "new",
+            "binding_view_types": "form"
+        }
+
+    def button_inventory_lookup_by_chemistries(self):
+        return {
+            "name": _("By Chemistries"),
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            "res_model": "by.chemistries.wizard",
+            "views": [(False, "form")],
+            "view_id": self.env.ref("abs_inventory_lookup.view_by_chemistries_form",
+                                    "False"),
+            "target": "new",
+            "binding_view_types": "form"
+        }
+
+
+
+
 
 
 class InventoryLookUPByTtem(models.Model):
@@ -99,7 +132,7 @@ class InventoryLookUPByTtem(models.Model):
     info_elongation_max = fields.Float(string="Elongation-Max")
     info_received = fields.Selection([("received", "Received"),
                                       ("sold", "Sold")],
-                                     string="Received")
+                                     string="Received", ondelete='set null')
     info_start_date = fields.Date(string="Received Date")
     info_end_date = fields.Date(string="Sold Date")
     info_stock_status = fields.Selection([("transit", "In Transit"),
@@ -107,7 +140,7 @@ class InventoryLookUPByTtem(models.Model):
                                           ("reserved", "Reserved"),
                                           ("in_production", "In production"),
                                           ("not_available", "Not available")],
-                                         string="Stock Status")
+                                         string="Stock Status", ondelete='set null')
 
 
 class IventoryLookUpByChemistries(models.Model):
@@ -178,7 +211,7 @@ class IventoryLookUpByChemistries(models.Model):
     chem_elongation_max = fields.Float(string="Chem Elongation-Max")
     chem_received = fields.Selection([("received", "Received"),
                                       ("sold", "Sold")],
-                                     string="Chem Received")
+                                     string="Chem Received", ondelete='set null')
     chem_start_date = fields.Date(string="Chem Received Date")
     chem_end_date = fields.Date(string="Chem Sold Date")
     chem_stock_status = fields.Selection([("transit", "In Transit"),
@@ -186,7 +219,7 @@ class IventoryLookUpByChemistries(models.Model):
                                           ("reserved", "Reserved"),
                                           ("in_production", "In production"),
                                           ("not_available", "Not available")],
-                                         string="Chem Stock Status")
+                                         string="Chem Stock Status",ondelete='set null')
     # Chemistries Property
     chem_al_min = fields.Float(string="Al(Min-Max)")
     chem_al_max = fields.Float(string="Al-Max")

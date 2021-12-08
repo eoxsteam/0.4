@@ -22,7 +22,7 @@
                 <tree string="Freight">
                     <field name="name"/>
                     <field name="sale_order_id"/>
-                    <field name="stock_picking_id" string="Picking/Dispatch Reference" readonly="1"/>
+                    <field name="stock_picking_id" string="Dispatch Reference" readonly="1"/>
                     <field name="create_uid" readonly="1"/>
                     <field name="create_date" readonly="1"/>
                     <field name="state"/>
@@ -102,13 +102,13 @@
                             <group string="Order Details">
                                 <field name="check_receive_bool" invisible="1"/>
                                 <field name="check_dispatch_bool" invisible="1"/>
-                                <field name="purchase_order_id" readonly="1" attrs="{'invisible': [('check_dispatch_bool', '=', True)]}"/>
-                                <field name="sale_order_id" readonly="1" attrs="{'invisible': [('check_receive_bool', '=', True)]}"/>
-                                <field name="stock_picking_id" readonly="1"/>
+                                <field name="purchase_order_id" attrs="{'invisible': [('check_dispatch_bool', '=', True)]}"/>
+                                <field name="sale_order_id" attrs="{'invisible': [('check_receive_bool', '=', True)]}"/>
+                                <field name="stock_picking_id"/>
 
-                                <field name="job_order_id" readonly="1"/>
-                                <field name="create_uid" readonly="1"/>
-                                <field name="create_date" readonly="1"/>
+                                <field name="job_order_id"/>
+                                <field name="create_uid"/>
+                                <field name="create_date"/>
                                 <field name="company_id" invisible="1"/>
                                 <field name="company_currency" invisible="1"/>
                             </group>

@@ -46,6 +46,8 @@ class FreightManagement(models.Model):
     invoice_count = fields.Integer(string="Invoice Count", compute="_compute_invoice")
     check_receive_bool = fields.Boolean(string="Check  Receive Bool")
     check_dispatch_bool = fields.Boolean(string="Check  Dispatch Bool")
+    create_uid = fields.Many2one('res.users', readonly=False)
+    create_date = fields.Datetime(readonly=False)
 
     @api.depends('frm_line_ids.invoice_id')
     def _compute_invoice(self):

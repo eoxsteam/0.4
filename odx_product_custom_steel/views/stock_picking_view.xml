@@ -14,6 +14,15 @@
                 <xpath expr="//button[@name='button_validate']" position="attributes">
                         <attribute name="invisible">1</attribute>
                 </xpath>
+                <xpath expr="//notebook/page[1]/button[@name='put_in_pack']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>    
+                <xpath expr="//notebook/page[2]/button[@name='put_in_pack']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//notebook/page[3]/button[@name='put_in_pack']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
 
                 <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='product_uom']"
                        position="after">

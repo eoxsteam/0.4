@@ -24,16 +24,16 @@ from odoo import api, models, fields,_
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    credit_limit=fields.Float(string="Credit Approved")
+    credit_limit=fields.Float(string="Available Credit", compute='_compute_available_credit')
     order_type = fields.Selection([("mat","MAT"),("prc","PRC")],
                                     string="Order Type")
     customer_po_number = fields.Char(string="Customer PO Number")
     order_due_date = fields.Date(string="Order Due Date")
     hot = fields.Boolean(string="Hot")
     res_receiving_hours_id = fields.Many2one("res.receiving.hours.time.range",
-                                             string="Receiving Hours")
+                                             string="Receiving Hours", compute='_compute_recieving_hours_day', readonly=False)
     res_receiving_day_id = fields.Many2one("res.receiving.week.day.range",
-                                           string="Day Range")
+                                           string="Day Range", compute='_compute_recieving_hours_day', readonly=False)
 
     @api.onchange('partner_id')
     def onchange_partner_id_receiving_hours_credit_approved(self):
@@ -55,3 +55,19 @@ class SaleOrder(models.Model):
             self.update(values)
         return result
 
+    def _compute_available_credit(self):
+        limit = []
+        for rec in self:
+            limit = rec.partner_id.credit_limit - rec.partner_id.total_credit_used
+        self.credit_limit = limit
+
+    def _compute_recieving_hours_day(self):
+        hour = []
+        day = []
+        for rec in self:
+            if rec.partner_id.res_receiving_hours_id:
+                hour = rec.partner_id.res_receiving_hours_id
+            if rec.partner_id.res_receiving_day_id:
+                day = rec.partner_id.res_receiving_day_id
+        self.res_receiving_hours_id = hour
+        self.res_receiving_day_id = day

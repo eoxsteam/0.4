@@ -30,3 +30,4 @@ from . import res_edge
 from . import res_dfars_domestic
 from . import res_skid_cylinder
 from . import res_eye_pos
+from . import stock_move

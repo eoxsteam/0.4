@@ -26,6 +26,8 @@
                     <field name="width_in" invisible="1"/>
                     <field name="length_in"  attrs="{'readonly': [('material_type', '=', 'coil')], 'invisible': [('material_type', '!=', 'sheets')], }" invisible="1"/>
                     <field name="produced_lot_ids" widget="many2many_tags" readonly="1" force_save="1" invisible="1"/>
+                    <field name="cwt_price" invisible="1"/>
+
 
                 </xpath>
 
@@ -35,6 +37,7 @@
                     <field name="width_in"/>
                     <field name="length_in"  attrs="{'readonly': [('material_type', '=', 'coil')], 'invisible': [('material_type', '!=', 'sheets')], }"/>
                     <field name="produced_lot_ids" widget="many2many_tags" readonly="1" force_save="1"/>
+                    <field name="cwt_price" />
                 </xpath>
 
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="attributes">

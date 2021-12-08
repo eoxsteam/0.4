@@ -156,6 +156,7 @@ class StockMove(models.Model):
     width_in = fields.Float(string='Width(in)', digits=[6, 4])
     thickness_in = fields.Float(string='Thickness(in)', digits=[6, 4])
     length_in = fields.Float(string='Length(in)', digits=[6, 4])
+    # cwt_price = fields.Float(string='CWT Price', digits=[6, 2])
 
     @api.depends('move_line_nosuggest_ids.select')
     def _onchange_move_line(self):

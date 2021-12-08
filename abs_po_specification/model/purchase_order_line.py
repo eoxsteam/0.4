@@ -61,7 +61,7 @@ class PurchaseOrderLine(models.Model):
     condition=fields.Char(string="Condition")
     projection_number=fields.Char(string="Projection Number")
     res_nct_ct_id = fields.Many2one('res.nct.ct',string="NCT/CT")
-    res_gauge_id = fields.Many2one('res.gauge',string="Gauge")
+    res_gauge_id = fields.Many2one('steel.gauge',string="Gauge")
     res_edge_id = fields.Many2one('res.edge',string="Edge")
     res_oil_dry_id= fields.Many2one('res.oil.dry',string="Oil/Dry")
     res_gauge_type_id= fields.Many2one('res.gauge.type',string="Gauge Type")
@@ -150,8 +150,135 @@ class PurchaseOrderLine(models.Model):
     thickness_min = fields.Float(string="Thickness Min")
     thickness_max = fields.Float(string="Thickness Max")
     po_weight = fields.Float(string='Weight')
+    width_tolerance_min = fields.Float(string='Width Tolerance(min)', digits=[6, 4])
+    width_tolerance_max = fields.Float(string='Width Tolerance(max)', digits=[6, 4])
+    cwt_price = fields.Float(string='CWT Price', digits=[6, 2])
 
-class PurchaseOrderLine(models.Model):
+
+    @api.onchange('res_gauge_id')
+    def _onchange_res_gauge_id(self):
+        if self.res_gauge_id:
+            self.thickness_in = self.res_gauge_id.gauge_inch
+        else:
+            self.thickness_in = 0.0     
+
+    def _prepare_stock_moves(self, picking):
+        res = super(PurchaseOrderLine, self)._prepare_stock_moves(picking)
+        res[0].update({'vendor_tag_number':self.vendor_tag_number,
+                        'part_no':self.part_no,
+                        'inventory_grade':self.inventory_grade,
+                        'finish': self.finish,
+                        'coating': self.coating,
+                        'res_nct_ct_id': self.res_nct_ct_id and self.res_nct_ct_id.id or False,
+                        'rb_min': self.rb_min,
+                        'rb_max': self.rb_max,
+                        'olsen_min': self.olsen_min,
+                        'res_gauge_id': self.res_gauge_id and self.res_gauge_id.id or False,
+                        'gauge_min': self.gauge_min,
+                        'gauge_max': self.gauge_max,
+                        'width_in': self.width_in,
+                        'width_tolerance_min': self.width_tolerance_min,
+                        'width_tolerance_max': self.width_tolerance_max,
+                        'length_in': self.length_in,
+                        'length_tolerance_max': self.length_tolerance_max,
+                        'length_tolerance_min': self.length_tolerance_min,
+                        'sq_tolerance_min': self.sq_tolerance_min,
+                        'sq_tolerance_max': self.sq_tolerance_max,
+                        'id_min': self.id_min,
+                        'id_max': self.id_max,
+                        'od_min': self.od_min,
+                        'od_max': self.od_max,
+                        'coil_max': self.coil_max,
+                        'coil_min': self.coil_min,
+                        'thickness_min': self.thickness_min,
+                        'thickness_max': self.thickness_max,
+                        'max_lift': self.max_lift,
+
+                        'surface': self.surface,
+                        'mill_stencil': self.mill_stencil,
+                        'ductility': self.ductility,
+                        'part_category': self.part_category,
+                        'res_edge_id': self.res_edge_id and self.res_edge_id.id or False,
+                        'spangle': self.spangle,
+                        'coating_weight': self.coating_weight,
+                        'res_oil_dry_id': self.res_oil_dry_id and self.res_oil_dry_id.id or False,
+                        'res_gauge_type_id': self.res_gauge_type_id and self.res_gauge_type_id.id or False,
+                        'res_receive_tag_id': self.res_receive_tag_id and self.res_receive_tag_id.id or False,
+                        'certsreq': self.certsreq,
+                        'res_yte_id': self.res_yte_id and self.res_yte_id.id or False,
+                        'release_no': self.release_no,
+                        'res_dfars_domestic_id': self.res_dfars_domestic_id and self.res_dfars_domestic_id.id or False,
+                        'reserve_customer_id': self.reserve_customer_id and self.reserve_customer_id.id or False,
+                        'condition': self.condition,
+                        'projection_number': self.projection_number,
+                        'chem_c': self.chem_c,
+                        'chem_mn': self.chem_mn,
+                        'chem_p': self.chem_p,
+                        'chem_s': self.chem_s,
+                        'chem_al': self.chem_al,
+                        'chem_ti': self.chem_ti,
+                        'chem_cu': self.chem_cu,
+                        'chem_fe': self.chem_fe,
+                        'chem_mg': self.chem_mg,
+                        'chem_b': self.chem_b,
+                        'chem_si': self.chem_si,
+                        'chem_n': self.chem_n,
+                        'chem_ca': self.chem_ca,
+                        'chem_co': self.chem_co,
+                        'chem_ni': self.chem_ni,
+                        'chem_zn': self.chem_zn,
+                        'chem_nb_cb': self.chem_nb_cb,
+                        'chem_soluble_aluminium': self.chem_soluble_aluminium,
+                        'chem_carbon_equivalent': self.chem_carbon_equivalent,
+                        'chem_residual_hydrogen': self.chem_residual_hydrogen,
+
+                        'chem_total_residual': self.chem_total_residual,
+                        'physical_yield': self.physical_yield,
+                        'tensile': self.tensile,
+                        'elongation': self.elongation,
+                        'r_value': self.r_value,
+                        'n_value': self.n_value,
+                        'olsen_id': self.olsen_id,
+                        'olsen_od': self.olsen_od,
+                        'rb_id': self.rb_id,
+                        'rb_od': self.rb_od,
+                        'core_loss': self.core_loss,
+                        'permeability': self.permeability,
+                        'grain_size': self.grain_size,
+                        'r_o_a': self.r_o_a,
+                        'hardenability': self.hardenability,
+                        'charpy': self.charpy,
+                        'olsen': self.olsen,
+                        'brinell': self.brinell,
+                        'ductility': self.ductility,
+                        'heat_no': self.heat_no,
+                        'res_skid_cylinder_id': self.res_skid_cylinder_id and self.res_skid_cylinder_id.id or False,
+                        'res_eye_pos': self.res_eye_pos and self.res_eye_pos.id or False,
+                        'wind': self.wind,
+                        'spacers': self.spacers,
+                        'bands_id': self.bands_id,
+                        'bands_od': self.bands_od,
+                        'cores': self.cores,
+                        'interleave': self.interleave,
+                        'paper': self.paper,
+                        'vci_paper': self.vci_paper,
+                        'packaging_instructions': self.packaging_instructions,
+                        'edge_protection': self.edge_protection,
+                        'package_type': self.package_type,
+                        'protect_id': self.protect_id,
+                        'protect_od': self.protect_od,
+                        'skids': self.skids,
+                        'skid_bands': self.skid_bands,
+                        'res_crane': self.res_crane and self.res_crane.id or False,
+                        'fork_lift': self.fork_lift,
+                        'detailed_instructions': self.detailed_instructions,
+                        'cwt_price':self.cwt_price,
+                        
+
+                    })
+        return res
+
+class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     sale_order_ids = fields.Many2many('sale.order', string='Sale Order Reference')

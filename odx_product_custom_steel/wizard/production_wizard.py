@@ -66,34 +66,38 @@ class ProductionWizard(models.TransientModel):
 
         production_object = self.env['steel.production']
         job_object = self.env['job.order']
+        work_object = self.env['production.instructions']
 
         job_order_lots = []
         job_order_process = ''
         production_process = ''
         production_lots = []
+        work_order_lots = []
+        work_order_process = ''
 
         for line in option_lines:
             # if self.warehouse_id == line.lot_id.loc_warehouse.id:
             if not line.operation:
                 raise UserError(_('Please Select an Operation'))
-            if not line.is_job_order:
-                production_process = line.operation
-                production_lots.append((0, 0, {
-                    'lot_id': line.lot_id.id,
-                    'product_id': line.product_id.id,
-                    'category_id': line.category_id.id,
-                    'sub_category_id': line.sub_category_id.id,
-                    'product_uom_id': line.uom_id.id,
-                    'thickness_in': line.thickness_in,
-                    'product_qty': line.lot_id.product_qty,
-                    'lot_status': 'in_production',
-                    'width_in': line.width_in,
-                    'src_warehouse_id': line.lot_id.loc_warehouse.id,
-
-                }))
-                line.lot_id.stock_status = 'in_production'
-
-            else:
+            # if line.is_work_order:
+            #     print("is_work_order====================================")
+            #     work_order_process = line.operation
+            #     work_order_lots.append((0, 0, {
+            #         'lot_id': line.lot_id.id,
+            #         'product_id': line.product_id.id,
+            #         'category_id': line.category_id.id,
+            #         'sub_category_id': line.sub_category_id.id,
+            #         'product_uom_id': line.uom_id.id,
+            #         'thickness_in': line.thickness_in,
+            #         'product_qty': line.lot_id.product_qty,
+            #         'lot_status': 'in_production',
+            #         'width_in': line.width_in,
+            #         'src_warehouse_id': line.lot_id.loc_warehouse.id,
+            #
+            #     }))
+            #     line.lot_id.stock_status = 'in_production'
+            if line.is_job_order:
+                print("if not line.is_job_order:===========")
                 # job_order_lots.append(line.lot_id.id)
                 job_order_process = line.operation
                 job_order_lots.append((0, 0, {
@@ -110,6 +114,34 @@ class ProductionWizard(models.TransientModel):
 
                 }))
                 line.lot_id.stock_status = 'in_production'
+            else:
+                print("production_lots=========================")
+                production_process = line.operation
+                production_lots.append((0, 0, {
+                    'lot_id': line.lot_id.id,
+                    'product_id': line.product_id.id,
+                    'category_id': line.category_id.id,
+                    'sub_category_id': line.sub_category_id.id,
+                    'product_uom_id': line.uom_id.id,
+                    'thickness_in': line.thickness_in,
+                    'product_qty': line.lot_id.product_qty,
+                    'lot_status': 'in_production',
+                    'width_in': line.width_in,
+                    'src_warehouse_id': line.lot_id.loc_warehouse.id,
+
+                }))
+                line.lot_id.stock_status = 'in_production'
+
+        if work_order_lots:
+            new_work = work_object.create({
+                'date': fields.Datetime.now()
+            })
+            print("new_work========",new_work)
+            for work in new_work.run_line_ids:
+                print("work================",work.tag_line_ids)
+                lots_id = work.tag_line_ids.create(work_order_lots)
+                print("lots_id===============",lots_id)
+
         if job_order_lots:
             new_job = job_object.create({
                 # 'lot_id': line.lot_id.id,
@@ -263,3 +295,4 @@ class ProductionWizardLine(models.TransientModel):
         ('pickling', 'Pickling'),
     ], string='Operation', track_visibility="onchange")
     is_job_order = fields.Boolean(string='Job Order')
+    is_work_order = fields.Boolean(string='Work Order')

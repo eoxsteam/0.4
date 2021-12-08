@@ -294,8 +294,8 @@ class stock_quant(models.Model):
                 available_quantity = sum(quants.mapped('reserved_quantity'))
                 print("float_compare(abs(quantity), available_quantity, precision_rounding=rounding",
                       float_compare(abs(quantity), available_quantity, precision_rounding=rounding))
-                print(abs(quantity), available_quantity, rounding,"2222222222")
-                print(float_compare(abs(quantity), available_quantity, precision_rounding=rounding))
+                # print(abs(quantity), available_quantity, rounding,"2222222222")
+                # print(float_compare(abs(quantity), available_quantity, precision_rounding=rounding))
                 if float_compare(abs(quantity), available_quantity, precision_rounding=rounding) > 0:
                     raise UserError(
                         _('It is not possible to unreserve more products of %s than you have in stock.') % product_id.display_name)

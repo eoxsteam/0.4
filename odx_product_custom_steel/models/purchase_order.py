@@ -157,7 +157,8 @@ class PurchaseOrderLine(models.Model):
 
     @api.onchange('product_category_id')
     def _get_category_list(self):
-        self.product_id = False
+        if self.product_id and self.product_id.categ_id != self.sub_category_id:
+            self.product_id = False
         if self.product_category_id:
             fields_domain = [('parent_id', '=', self.product_category_id.id)]
             return {'domain': {'sub_category_id': fields_domain, }}
@@ -169,8 +170,20 @@ class PurchaseOrderLine(models.Model):
         if self.cwt_price:
             self.price_unit = self.cwt_price / 100
 
+    @api.onchange('product_id')
+    def _onchnge_product_id(self):
+        if self.product_id and self.product_id.categ_id:
+            self.sub_category_id = self.product_id.categ_id.id or False
+            if self.product_id.categ_id.parent_id:
+                self.product_category_id = self.product_id.categ_id.parent_id.id or False
+            else:
+                self.product_category_id = self.product_id.categ_id.id or False
+                self.sub_category_id = False
+
     @api.onchange('category_id', 'sub_category_id')
     def _domain_product_id(self):
+        if self.product_id and self.sub_category_id != self.product_id.categ_id:
+            self.product_id = False
         if self.sub_category_id:
             return {'domain': {'product_id': [('categ_id', '=', self.sub_category_id.id)]}}
         else:
@@ -375,11 +388,11 @@ class PurchaseOffer(models.Model):
     comp_mn = fields.Float(string="MN", digits=[4, 3])
     comp_p = fields.Float(string="P", digits=[4, 3])
     comp_s = fields.Float(string="S", digits=[4, 3])
-    comp_si = fields.Float(string="SI", digits=[4, 3])
     comp_al = fields.Float(string="AL", digits=[4, 3])
+    comp_ti = fields.Float(string="TI", digits=[4, 3])
+    comp_si = fields.Float(string="SI", digits=[4, 3])
     comp_al_total = fields.Float(string="AL Total", digits=[4, 3])
     comp_nb = fields.Float(string="NB", digits=[4, 3])
-    comp_ti = fields.Float(string="TI", digits=[4, 3])
     comp_b = fields.Float(string="B", digits=[4, 3])
     comp_cu = fields.Float(string="CU", digits=[4, 3])
     comp_as = fields.Float(string="As", digits=[4, 3])

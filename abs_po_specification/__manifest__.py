@@ -58,6 +58,7 @@
              "views/res_edge_view.xml",
              "views/res_skid_cylinder_view.xml",
              "views/res_eye_pos_view.xml",
+             "views/stock_picking_views.xml",
             ],
     "demo": [],
     "qweb": [],

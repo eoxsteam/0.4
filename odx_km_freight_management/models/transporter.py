@@ -4,10 +4,10 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     def daily_transporter_email(self):
-        print ("dddddddddddddddddd")
-        print ("dddddddddddddddddd")
-        print ("dddddddddddddddddd")
-        print ("dddddddddddddddddd",self)
+        # print ("dddddddddddddddddd")
+        # print ("dddddddddddddddddd")
+        # print ("dddddddddddddddddd")
+        # print ("dddddddddddddddddd",self)
         for line in self:
             template_id = self.env.ref('odx_km_freight_management.mail_template_transport_detail_mail').id
             lang = self.env.context.get('lang')

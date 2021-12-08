@@ -8,8 +8,8 @@
                <group>
                    <group> 
                        <field name="info_category_id"/>
-                       <field name="info_sub_category_id"/>
-                       <field name="info_sub_product_id"/> 
+                       <field name="info_sub_category_id" />
+                       <field name="info_sub_product_id" string="Product"/>
                    </group>
                    <group>
                        <field name="info_partner_id"/>
@@ -21,14 +21,14 @@
                    <group>
                        <label for="info_gauge_min"/>
                        <div class="o_row">
-                           <field name="info_gauge_min"/>
-                           <field name="info_gauge_max"/>
+                           <field name="info_gauge_min" widget="many2many_tags"/>
+<!--                           <field name="info_gauge_max"/>-->
                        </div>
-                       <label for="info_thickness_min"/>
-                       <div class="o_row">
-                           <field name="info_thickness_min"/>
-                           <field name="info_thickness_max"/>
-                       </div>
+<!--                       <label for="info_thickness_min"/>-->
+<!--                       <div class="o_row">-->
+<!--                           <field name="info_thickness_min"/>-->
+<!--                           <field name="info_thickness_max"/>-->
+<!--                       </div>-->
                        <label for="info_width_min"/>
                        <div class="o_row">
                            <field name="info_width_min"/>

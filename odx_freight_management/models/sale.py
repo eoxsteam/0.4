@@ -12,7 +12,7 @@ class SaleOrderLineInher(models.Model):
 		frm_cur = self.env.company.currency_id
 		to_cur = order_id.pricelist_id.currency_id
 		purchase_price = product_id.standard_price
-		print (purchase_price,"ffffffffffffffffffffff")
+		# print (purchase_price,"ffffffffffffffffffffff")
 		if product_uom_id != product_id.uom_id:
 			purchase_price = product_id.uom_id._compute_price(purchase_price, product_uom_id)
 		price = frm_cur._convert(
@@ -20,8 +20,9 @@ class SaleOrderLineInher(models.Model):
 			order_id.date_order or fields.Date.today(), round=False)
 		if product_id.categ_id.property_cost_method == 'fifo':
 			if self.lot_id:
-				print ("ssssssssssssssssssssss")
-				print ("ssssssssssssssssssssss")
-				print ("ssssssssssssssssssssss")
+				pass
+				# print ("ssssssssssssssssssssss")
+				# print ("ssssssssssssssssssssss")
+				# print ("ssssssssssssssssssssss")
 		return price
 

@@ -27,6 +27,7 @@ class SaleOrder(models.Model):
                                 'length_in': line.chem_length_min,
                                 'order_id': line.so_look_up_by_chemistries_id.id,
                             })
+                            line.unlink()
             if name == 'inventory_look_up_by_item_ids':
                 # print("inventory_look_up_by_item_ids==================", selected_ids)
                 look_up_by_item_sudo = self.env['inventory.look.up.by.item']
@@ -46,4 +47,5 @@ class SaleOrder(models.Model):
                                 'length_in': line.info_length_min,
                                 'order_id': line.so_look_up_by_item_id.id,
                             })
+                            line.unlink()
         return True

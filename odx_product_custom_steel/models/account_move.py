@@ -28,6 +28,7 @@ class AccountMoveLine(models.Model):
         ('coil', 'Coil'),
         ('sheets', 'Sheets'),
     ], string='Material Type', track_visibility="onchange")
+    cwt_price = fields.Float(string='CWT Price', digits=[6, 2])
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -63,6 +64,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     def _prepare_invoice_line(self):
+        # print("\n\n\n==========_prepare_invoice_line===============")
         res = super(SaleOrderLine, self)._prepare_invoice_line()
         res['category_id'] = self.category_id and self.category_id.id or False
         res['sub_category_id'] = self.sub_category_id and self.sub_category_id.id or False
@@ -73,6 +75,7 @@ class SaleOrderLine(models.Model):
         res['thickness_in'] = self.thickness_in
         res['length_in'] = self.length_in
         res['material_type'] = self.material_type or False
+        res['cwt_price'] = self.cwt_price or False
 
         return res
 class SaleOrder(models.Model):
@@ -80,6 +83,7 @@ class SaleOrder(models.Model):
 
 
     def _create_invoices(self, grouped=False, final=False):
+        # print("_create_invoices===================================================")
         """
         Create the invoice associated to the SO.
         :param grouped: if True, invoices are grouped by SO id. If False, invoices are grouped by
@@ -187,7 +191,7 @@ class SaleOrder(models.Model):
 
         # Manage the creation of invoices in sudo because a salesperson must be able to generate an invoice from a
         # sale order without "billing" access rights. However, he should not be able to create an invoice from scratch.
-        print ("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",invoice_vals_list)
+        # print ("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",invoice_vals_list)
         moves = self.env['account.move'].sudo().with_context(default_type='out_invoice').create(invoice_vals_list)
 
         # 4) Some moves might actually be refunds: convert them if the total amount is negative

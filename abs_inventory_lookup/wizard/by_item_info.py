@@ -25,9 +25,9 @@ class ByItemInfoWizard(models.TransientModel):
     _description = "By Item Info Wizard"
 
     info_category_id = fields.Many2one("product.category",
-                                       string="Master")
+                                       string="Master",domain="[('parent_id', '=', False)]")
     info_sub_category_id = fields.Many2one("product.category",
-                                           string="Sub Category")
+                                           string="Sub Category", domain="[('parent_id', '!=', False)]")
     info_sub_product_id = fields.Many2one("product.product",
                                           string="Sub Product")
     info_partner_id = fields.Many2one("res.partner",
@@ -36,8 +36,9 @@ class ByItemInfoWizard(models.TransientModel):
                                     related="info_partner_id.vendor_serial_number")
     info_partner_reserver_id = fields.Many2one("res.partner",
                                                string="Reserve Customer")
-    info_gauge_min = fields.Integer(string="Gauge(Min-Max)")
-    info_gauge_max = fields.Integer(string="Gauge-Max")
+    # info_gauge_min = fields.Integer(string="Gauge(Min-Max)")
+    # info_gauge_max = fields.Integer(string="Gauge-Max")
+    info_gauge_min = fields.Many2many('steel.gauge', string="Thickness(Min-Max)")
     info_thickness_min = fields.Float(string="Thickness(Min-Max)")
     info_thickness_max = fields.Float(string="Thickness-Max")
     info_width_min = fields.Float(string="Width(Min-Max)")
@@ -96,7 +97,13 @@ class ByItemInfoWizard(models.TransientModel):
                                          ("not_available","Not available")],
                                          string="Stock Status")
 
+    @api.onchange('info_sub_category_id')
+    def onchange_sub_category_id(self):
+        for rec in self:
+            return {'domain': {'info_sub_product_id': [('categ_id', '=', rec.info_sub_category_id.id)]}}
+
     def button_by_item_info_search(self):
+        # print("\n\n\nbutton_by_item_info_search================",self)
         domain_list = []
         if self.info_category_id:
             domain_list.append(("category_id.id",
@@ -203,9 +210,38 @@ class ByItemInfoWizard(models.TransientModel):
             production_lot_objs = self.env["stock.production.lot"]. \
                                 search(domain_list)
             production_lot_objs_list = []
+            context = dict(self._context)
+
+            look_up_by_item = {}
+            inventory_look_by_item_id = None
             for production_lot_obj in production_lot_objs:  
                 production_lot_objs_list.append(production_lot_obj.id)
-            if production_lot_objs_list: 
+                if production_lot_obj.category_id:
+                    look_up_by_item['info_category_id'] = production_lot_obj.category_id.id or production_lot_obj.category_id
+                if production_lot_obj.sub_category_id:
+                    look_up_by_item['info_sub_category_id'] = production_lot_obj.sub_category_id.id or production_lot_obj.sub_category_id
+                if production_lot_obj.product_id:
+                    look_up_by_item['info_sub_product_id'] = production_lot_obj.product_id.id or production_lot_obj.product_id
+                if context.get('active_id'):
+                    look_up_by_item['so_look_up_by_item_id'] = context.get('active_id')
+                if production_lot_obj.stock_status:
+                    look_up_by_item['info_stock_status'] = production_lot_obj.stock_status
+                if production_lot_obj.thickness_mm:
+                    look_up_by_item['info_thickness_min'] = production_lot_obj.thickness_mm
+                if production_lot_obj.width_in:
+                    look_up_by_item['info_width_min'] = production_lot_obj.width_in
+                if production_lot_obj.length_mm:
+                    look_up_by_item['info_length_min'] = production_lot_obj.length_mm
+                if production_lot_obj.weight_lb:
+                    look_up_by_item['info_weight_min'] = production_lot_obj.weight_lb
+                if look_up_by_item and context.get('active_id'):
+                    # print("if look_up_by_item and context.get('active_id'):===================")
+                    inventory_look_by_item_id = self.env['inventory.look.up.by.item'].create(look_up_by_item)
+                # return True
+                # print("inventory_look_by_item_id=====================",inventory_look_by_item_id,self._context)
+            # print("\n\n\nproduction_lot_objs_list================",production_lot_objs_list,self._context)
+            #
+            if production_lot_objs_list and not context.get('active_id') :
                 return {
                     "type": "ir.actions.act_window",
                     "name": _("Lots/Serial Numbers"),
@@ -213,3 +249,6 @@ class ByItemInfoWizard(models.TransientModel):
                     "view_mode": "tree,form",
                     "domain":[("id","in",production_lot_objs_list)]
                    }
+
+        return True
+

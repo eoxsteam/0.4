@@ -184,7 +184,7 @@
                                     <label for="stock_status"/>
                                 </td>
                                 <td>
-                                    <field name="stock_status" />
+                                    <field name="stock_status" attrs="{'readonly': True}"/>
                                 </td>
                             </tr>
                             <tr>

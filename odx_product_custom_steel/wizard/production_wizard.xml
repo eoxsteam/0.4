@@ -131,6 +131,7 @@
                             <tree create="false" editable="bottom">
                                 <field name="select_line"/>
                                 <field name="is_job_order"/>
+<!--                                <field name="is_work_order" />-->
                                 <field name="operation"/>
                                 <field name="production_wizard_id" invisible="1"/>
                                 <field name="lot_id" readonly="1" force_save="1"/>

@@ -7,6 +7,39 @@ from odoo.tools import float_compare
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    def generate_freight(self):
+        # print("\n\n\n generate_freight================", self)
+        if self.env.user.has_group('odx_freight_management.group_frm_view_access'):
+            freight_object = self.env['freight.management']
+            # print("self.picking_ids===============",self.picking_ids)
+            vals = {
+                'sale_order_id': self.id,
+                'stock_picking_id': self.picking_ids.id,
+                'cargo_lines': []
+            }
+            for line in self.order_line:
+                vals['cargo_lines'].append((0, 0, {
+                    'name': line.name,
+                    'sub_category_id': line.sub_category_id and line.sub_category_id.id,
+                    'product_uom_qty': line.product_uom_qty,
+                    'product_id': line.product_id and line.product_id.id,
+                    'lot_ids': [(6, 0, line.produced_lot_ids)],
+                }))
+            new_freight = freight_object.create(vals)
+            self.freight_id = new_freight.id
+            return {
+                'name': 'Freight Management',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'freight.management',
+                'view_id': False,
+                'target': 'current',
+                'res_id': new_freight.id,
+                'type': 'ir.actions.act_window',
+            }
+        else:
+            raise UserError(_("You do not have the permission to access Freights. Please contact admin"))
+
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
         self.send_back_status = 'done'
@@ -37,6 +70,9 @@ class SaleOrder(models.Model):
         else:
             raise UserError(_("You do not have the permission to access Production. Please contact admin"))
 
+    def action_view_work_orders(self):
+        print("\n\n\naction_view_work_orders============")
+
     def action_view_job_orders(self):
         lines = []
         if self.env.user.has_group('odx_steel_production.group_production_view_access'):
@@ -63,6 +99,9 @@ class SaleOrder(models.Model):
         if self.order_line:
             lines = self.mapped('order_line').mapped('production_lot_ids')
         self.production_count = len(lines)
+
+    def _compute_work_order_count(self):
+        print("_compute_work_order_count==================")
 
     def _compute_job_order_count(self):
         lines = []
@@ -245,6 +284,7 @@ class SaleOrder(models.Model):
     is_send_back = fields.Boolean(string="Send back", default=False, copy=False)
     production_count = fields.Integer(string="Count", compute="_compute_production_count")
     job_order_count = fields.Integer(string="JobCount", compute="_compute_job_order_count")
+    work_order_count = fields.Integer(string="WorkCount", compute="_compute_work_order_count")
     is_quotation_sent = fields.Boolean(string="Quotation Status Check", default=False, copy=False)
     send_back_status = fields.Selection([
         ('option_send', 'Send Options'),
@@ -517,6 +557,11 @@ class SaleOrderLine(models.Model):
     def get_cwt_based_unit_price(self):
         if self.cwt_price:
             self.price_unit = self.cwt_price / 100
+
+    @api.onchange('price_unit')
+    def get_price_unit_based_cwt(self):
+        if self.price_unit:
+            self.cwt_price = self.price_unit * 100
 
     category_id = fields.Many2one('product.category', string="Master", domain="[('parent_id', '=', False)]")
     sub_category_id = fields.Many2one('product.category', string="Sub Category",

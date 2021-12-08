@@ -9,7 +9,7 @@
                    <group> 
                        <field name="chem_category_id" string="Master"/>
                        <field name="chem_sub_category_id" string="Sub Category"/>
-                       <field name="chem_sub_product_id" string="Sub Product"/> 
+                       <field name="chem_sub_product_id" string="Product"/>
                    </group>
                    <group>
                        <field name="chem_partner_id" string="Vendor"/>
@@ -19,16 +19,16 @@
                </group>
                <group>
                    <group>
-                       <label for="chem_gauge_min" string="Gauge(Min-Max)"/>
+                       <label for="chem_gauge_min" string="Thickness(Min-Max)"/>
                        <div class="o_row">
-                           <field name="chem_gauge_min"/>
-                           <field name="chem_gauge_max"/>
+                           <field name="chem_gauge_min" widget="many2many_tags"/>
+<!--                           <field name="chem_gauge_max"/>-->
                        </div>
-                       <label for="chem_thickness_min" string="Thickness(Min-Max)"/>
-                       <div class="o_row">
-                           <field name="chem_thickness_min"/>
-                           <field name="chem_thickness_max"/>
-                       </div>
+<!--                       <label for="chem_thickness_min" string="Thickness(Min-Max)"/>-->
+<!--                       <div class="o_row">-->
+<!--                           <field name="chem_thickness_min"/>-->
+<!--                           <field name="chem_thickness_max"/>-->
+<!--                       </div>-->
                        <label for="chem_width_min" string="Width(Min-Max)"/>
                        <div class="o_row">
                            <field name="chem_width_min"/>

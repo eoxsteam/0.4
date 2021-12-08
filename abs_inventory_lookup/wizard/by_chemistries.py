@@ -25,9 +25,9 @@ class ByChemistriesWizard(models.TransientModel):
     _description = "By Chemistries Wizard"
 
     chem_category_id = fields.Many2one("product.category",
-                                       string="Chem Master")
+                                       string="Chem Master",domain="[('parent_id', '=', False)]")
     chem_sub_category_id = fields.Many2one("product.category",
-                                           string="Chem Sub Category")
+                                           string="Chem Sub Category", domain="[('parent_id', '!=', False)]")
     chem_sub_product_id = fields.Many2one("product.product",
                                           string="Chem Sub Product")
     chem_partner_id = fields.Many2one("res.partner",
@@ -36,8 +36,9 @@ class ByChemistriesWizard(models.TransientModel):
                                      related="chem_partner_id.name")
     chem_partner_reserver_id = fields.Many2one("res.partner",
                                                string="Chem Reserve Customer")
-    chem_gauge_min = fields.Integer(string="Chem Gauge(Min-Max)")
-    chem_gauge_max = fields.Integer(string="Chem Gauge-Max")
+    # chem_gauge_min = fields.Integer(string="Chem Gauge(Min-Max)")
+    # chem_gauge_max = fields.Integer(string="Chem Gauge-Max")
+    chem_gauge_min = fields.Many2many('steel.gauge', string="Thickness(Min-Max)")
     chem_thickness_min = fields.Float(string="Chem Thickness(Min-Max)")
     chem_thickness_max = fields.Float(string="Chem Thickness-Max")
     chem_width_min = fields.Float(string="Chem Width(Min-Max)")     
@@ -52,7 +53,7 @@ class ByChemistriesWizard(models.TransientModel):
                                           ("in","IN")],
                                           string="Chem Len MM/IN",
                                           default="mm") 
-    chem_weight_min = fields.Integer(string="Chem Weight(Min-Max)")     
+    chem_weight_min = fields.Integer(string="Chem Weight(Min-Max)")
     chem_weight_max = fields.Integer(string="Chem Weight-Max")
     chem_weight_selection = fields.Selection([("lbs","Lbs"),
                                              ("kg","KG")],
@@ -160,6 +161,11 @@ class ByChemistriesWizard(models.TransientModel):
     chem_v_max = fields.Float(string="V-Max")
     chem_nb_cb_min = fields.Float(string="Nb/Cb(Min-Max)") 
     chem_nb_cb_max = fields.Float(string="Nb/Cb-Max")
+
+    @api.onchange('chem_sub_category_id')
+    def onchange_chem_sub_category_id(self):
+        for rec in self:
+            return {'domain': {'chem_sub_product_id': [('categ_id', '=', rec.chem_sub_category_id.id)]}}
 
     def button_by_chemistries_search(self):
         domain_list = []
@@ -366,9 +372,34 @@ class ByChemistriesWizard(models.TransientModel):
             production_lot_objs = self.env["stock.production.lot"].\
                                   search(domain_list)
             production_lot_obj_lst=[]
+            look_up_by_chemistries = {}
+            inventory_look_by_chemistries_id = None
+            context = dict(self._context)
             for production_lot_obj in production_lot_objs:
-                production_lot_obj_lst.append(production_lot_obj.id)
-            if production_lot_obj_lst:
+                if production_lot_obj.category_id:
+                    look_up_by_chemistries['chem_category_id'] = production_lot_obj.category_id.id or production_lot_obj.category_id
+                if production_lot_obj.sub_category_id:
+                    look_up_by_chemistries['chem_sub_category_id'] = production_lot_obj.sub_category_id.id or production_lot_obj.sub_category_id
+                if production_lot_obj.product_id:
+                    look_up_by_chemistries['chem_sub_product_id'] = production_lot_obj.product_id.id or production_lot_obj.product_id
+                if context.get('active_id'):
+                    look_up_by_chemistries['so_look_up_by_chemistries_id'] = context.get('active_id')
+                if production_lot_obj.stock_status:
+                    look_up_by_chemistries['chem_stock_status'] = production_lot_obj.stock_status
+                if production_lot_obj.thickness_mm:
+                    look_up_by_chemistries['chem_thickness_min'] = production_lot_obj.thickness_mm
+                if production_lot_obj.width_in:
+                    look_up_by_chemistries['chem_width_min'] = production_lot_obj.width_in
+                if production_lot_obj.length_mm:
+                    look_up_by_chemistries['chem_length_min'] = production_lot_obj.length_mm
+                if production_lot_obj.weight_lb:
+                    look_up_by_chemistries['chem_weight_min'] = production_lot_obj.weight_lb
+                if look_up_by_chemistries and context.get('active_id'):
+                    inventory_look_by_chemistries_id = self.env['inventory.look.up.by.chemistries'].create(look_up_by_chemistries)
+                    # print("inventory_look_by_item_id=====================",inventory_look_by_chemistries_id,self._context)
+                    production_lot_obj_lst.append(production_lot_obj.id)
+
+            if production_lot_obj_lst and not context.get('active_id'):
                 return {
                         "name": _("Lots/Serial Numbers"),
                         "type": "ir.actions.act_window",
@@ -376,3 +407,5 @@ class ByChemistriesWizard(models.TransientModel):
                         "res_model": "stock.production.lot",
                         "domain":[("id","in",production_lot_obj_lst)]
                        }
+
+        return True
